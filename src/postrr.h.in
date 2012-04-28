@@ -1,0 +1,108 @@
+/*
+ * PostRR - src/postrr.h
+ * Copyright (C) 2012 Sebastian 'tokkee' Harl <sh@tokkee.org>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/*
+ * PostgreSQL Round-Robin Extension
+ */
+
+#ifndef POSTRR_H
+#define POSTRR_H 1
+
+#include <postgres.h>
+#include <fmgr.h>
+
+#define POSTRR_VERSION_MAJOR @POSTRR_VERSION_MAJOR@
+#define POSTRR_VERSION_MINOR @POSTRR_VERSION_MINOR@
+#define POSTRR_VERSION_PATCH @POSTRR_VERSION_PATCH@
+
+#define POSTRR_VERSION_EXTRA "@POSTRR_VERSION_EXTRA@"
+
+#define POSTRR_VERSION_STRING "@POSTRR_VERSION_STRING@"
+
+#define POSTRR_VERSION_ENCODE(major, minor, patch) \
+	((major) * 10000 + (minor) * 100 + (patch))
+
+#define POSTRR_VERSION POSTRR_VERSION_ENCODE(POSTRR_VERSION_MAJOR, \
+		POSTRR_VERSION_MINOR, POSTRR_VERSION_PATCH)
+
+Datum
+postrr_version(PG_FUNCTION_ARGS);
+
+/*
+ * RRTimeslice data type
+ */
+
+struct rrtimeslice;
+typedef struct rrtimeslice rrtimeslice_t;
+
+#define PG_GETARG_RRTIMESLICE_P(n) (rrtimeslice_t *)PG_GETARG_POINTER(n)
+#define PG_RETURN_RRTIMESLICE_P(p) PG_RETURN_POINTER(p)
+
+Datum
+rrtimeslice_validate(PG_FUNCTION_ARGS);
+
+/* I/O functions */
+Datum
+rrtimeslice_in(PG_FUNCTION_ARGS);
+Datum
+rrtimeslice_out(PG_FUNCTION_ARGS);
+Datum
+rrtimeslice_typmodin(PG_FUNCTION_ARGS);
+Datum
+rrtimeslice_typmodout(PG_FUNCTION_ARGS);
+
+/* casts */
+Datum
+rrtimeslice_to_rrtimeslice(PG_FUNCTION_ARGS);
+
+/* comparison operators */
+Datum
+rrtimeslice_eq(PG_FUNCTION_ARGS);
+Datum
+rrtimeslice_ne(PG_FUNCTION_ARGS);
+Datum
+rrtimeslice_lt(PG_FUNCTION_ARGS);
+Datum
+rrtimeslice_le(PG_FUNCTION_ARGS);
+Datum
+rrtimeslice_gt(PG_FUNCTION_ARGS);
+Datum
+rrtimeslice_ge(PG_FUNCTION_ARGS);
+Datum
+rrtimeslice_cmp(PG_FUNCTION_ARGS);
+
+/*
+ * internal (not fmgr-callable) functions
+ */
+
+int
+rrtimeslice_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2);
+
+#endif /* ! POSTRR_H */
+
+/* vim: set tw=78 sw=4 ts=4 noexpandtab : */
+

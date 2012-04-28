@@ -1,0 +1,31 @@
+# build system stuff
+.deps
+Makefile
+Makefile.in
+Makefile.pgxs
+aclocal.m4
+autom4te.cache
+compile
+config.*
+configure
+depcomp
+install-sh
+missing
+postrr_config.h*
+stamp-h1
+version
+
+# ltdl stuff
+libtool
+ltmain.sh
+
+# build output
+.libs
+*.la
+*.lo
+*.o
+postrr.7
+postrr.h
+postrr.sql
+postrr-*.so
+

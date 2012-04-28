@@ -1,0 +1,39 @@
+POSTRR(7)
+=========
+Sebastian "tokkee" Harl <sh@tokkee.org>
+version {package_version}, {build_date}
+:doctype: manpage
+
+NAME
+----
+postrr - PostgreSQL Round-Robin Extension
+
+DESCRIPTION
+-----------
+PostRR is an extension for the PostgreSQL database management system providing
+round-robin functionality. It provides additional data types and functions to
+handle discrete time-series of data and consolidation thereof.
+
+DATA TYPES
+~~~~~~~~~~
+The following data types are provided as a base for building round-robin
+archives:
+
+* RRTimeslice: +
+  A timeslice implementing round-robin features. It is defined by the length
+  of the slice and the number of slices before wrapping around.
+
+AUTHOR
+------
+PostRR was written by Sebastian "tokkee" Harl <sh@tokkee.org>.
+
+COPYRIGHT
+---------
+Copyright (C) 2012 Sebastian "tokkee" Harl <sh@tokkee.org>
+
+This is free software under the terms of the BSD license, see the source for
+copying conditions. There is NO WARRANTY; not even for MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.
+
+// vim: set tw=78 sw=4 ts=4 noexpandtab spell spelllang=en_us :
+

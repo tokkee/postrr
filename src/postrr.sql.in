@@ -1,0 +1,206 @@
+-- PostRR - src/postrr.sql
+-- Copyright (C) 2012 Sebastian 'tokkee' Harl <sh@tokkee.org>
+-- All rights reserved.
+--
+-- Redistribution and use in source and binary forms, with or without
+-- modification, are permitted provided that the following conditions
+-- are met:
+-- 1. Redistributions of source code must retain the above copyright
+--    notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+--    notice, this list of conditions and the following disclaimer in the
+--    documentation and/or other materials provided with the distribution.
+--
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+-- ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+-- TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+-- PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
+-- CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+-- EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+-- PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+-- OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+-- WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+-- OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+-- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--
+-- PostRR - PostgreSQL Round-Robin Extension
+--
+
+-- suppress messages like 'return type foo is only a shell'
+SET client_min_messages TO WARNING;
+
+BEGIN;
+
+CREATE SCHEMA postrr;
+
+CREATE SEQUENCE postrr.tsid INCREMENT BY 1
+	MINVALUE 1 MAXVALUE 2147483647 START WITH 1 NO CYCLE;
+
+CREATE TABLE postrr.rrtimeslices (
+	tsid integer NOT NULL PRIMARY KEY
+		DEFAULT nextval('postrr.tsid'::regclass)
+		CHECK (0 < tsid),
+	tslen integer NOT NULL,
+	tsnum integer NOT NULL
+);
+
+CREATE OR REPLACE FUNCTION PostRR_Version()
+	RETURNS cstring
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'postrr_version'
+	LANGUAGE 'C' IMMUTABLE;
+
+CREATE TYPE RRTimeslice;
+
+CREATE OR REPLACE FUNCTION RRTimeslice_validate(integer)
+	RETURNS cstring
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_validate'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+-- this will abort the transaction in case the expected internal length does
+-- not match the actual length
+SELECT RRTimeslice_validate(16);
+
+CREATE OR REPLACE FUNCTION RRTimeslice_in(cstring, oid, integer)
+	RETURNS RRTimeslice
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_in'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION RRTimeslice_out(RRTimeslice)
+	RETURNS cstring
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_out'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION RRTimeslice_typmodin(cstring[])
+	RETURNS integer
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_typmodin'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION RRTimeslice_typmodout(integer)
+	RETURNS cstring
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_typmodout'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE TYPE RRTimeslice (
+	INTERNALLENGTH = 16,
+	INPUT          = RRTimeslice_in,
+	OUTPUT         = RRTimeslice_out,
+	TYPMOD_IN      = RRTimeslice_typmodin,
+	TYPMOD_OUT     = RRTimeslice_typmodout,
+	ALIGNMENT      = double,
+	STORAGE        = plain
+);
+
+CREATE OR REPLACE FUNCTION RRTimeslice(rrtimeslice, integer, boolean)
+	RETURNS rrtimeslice
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_to_rrtimeslice'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE CAST (rrtimeslice AS rrtimeslice)
+	WITH FUNCTION RRTimeslice(rrtimeslice, integer, boolean)
+	AS IMPLICIT;
+
+CREATE OR REPLACE FUNCTION RRTimeslice_eq(rrtimeslice, rrtimeslice)
+	RETURNS boolean
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_eq'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION RRTimeslice_ne(rrtimeslice, rrtimeslice)
+	RETURNS boolean
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_ne'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION RRTimeslice_lt(rrtimeslice, rrtimeslice)
+	RETURNS boolean
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_lt'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION RRTimeslice_le(rrtimeslice, rrtimeslice)
+	RETURNS boolean
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_le'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION RRTimeslice_gt(rrtimeslice, rrtimeslice)
+	RETURNS boolean
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_gt'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION RRTimeslice_ge(rrtimeslice, rrtimeslice)
+	RETURNS boolean
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_ge'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION RRTimeslice_cmp(rrtimeslice, rrtimeslice)
+	RETURNS integer
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_cmp'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE OPERATOR = (
+	LEFTARG    = RRTimeslice,
+	RIGHTARG   = RRTimeslice,
+	PROCEDURE  = RRTimeslice_eq,
+	COMMUTATOR = =,
+	NEGATOR    = <>,
+	RESTRICT   = eqsel
+);
+
+CREATE OPERATOR <> (
+	LEFTARG    = RRTimeslice,
+	RIGHTARG   = RRTimeslice,
+	PROCEDURE  = RRTimeslice_ne,
+	COMMUTATOR = <>,
+	NEGATOR    = =,
+	RESTRICT   = neqsel
+);
+
+CREATE OPERATOR < (
+	LEFTARG    = RRTimeslice,
+	RIGHTARG   = RRTimeslice,
+	PROCEDURE  = RRTimeslice_lt,
+	COMMUTATOR = >,
+	NEGATOR    = <=,
+	RESTRICT   = scalarltsel
+);
+
+CREATE OPERATOR <= (
+	LEFTARG    = RRTimeslice,
+	RIGHTARG   = RRTimeslice,
+	PROCEDURE  = RRTimeslice_le,
+	COMMUTATOR = >=,
+	NEGATOR    = <,
+	RESTRICT   = scalarltsel
+);
+
+CREATE OPERATOR > (
+	LEFTARG    = RRTimeslice,
+	RIGHTARG   = RRTimeslice,
+	PROCEDURE  = RRTimeslice_gt,
+	COMMUTATOR = <,
+	NEGATOR    = >=,
+	RESTRICT   = scalargtsel
+);
+
+CREATE OPERATOR >= (
+	LEFTARG    = RRTimeslice,
+	RIGHTARG   = RRTimeslice,
+	PROCEDURE  = RRTimeslice_ge,
+	COMMUTATOR = <=,
+	NEGATOR    = >,
+	RESTRICT   = scalargtsel
+);
+
+CREATE OPERATOR CLASS rrtimeslice_ops
+	DEFAULT FOR TYPE RRTimeslice USING btree AS
+		OPERATOR 1 < ,
+		OPERATOR 2 <= ,
+		OPERATOR 3 = ,
+		OPERATOR 4 >= ,
+		OPERATOR 5 > ,
+		FUNCTION 1 RRTimeslice_cmp(rrtimeslice, rrtimeslice);
+
+COMMIT;
+
+SET client_min_messages TO DEFAULT;
+
+-- vim: set tw=78 sw=4 ts=4 noexpandtab :
+

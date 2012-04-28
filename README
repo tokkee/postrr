@@ -1,0 +1,47 @@
+PostgreSQL Round-Robin Extension
+================================
+
+  PostRR (\ˈpōs-tər\) is an extension for the PostgreSQL database management
+  system providing round-robin functionality. It provides additional data
+  types and functions to handle discrete time-series of data and consolidation
+  thereof.
+
+  For now, the software is in an early and very experimental state.
+
+  This is free and open source software, licensed under the 2-clause BSD
+  license. See COPYING for details.
+
+Prerequisites
+-------------
+
+  To compile the PostRR package from source you need:
+
+  * A build environment: autotools, libtool, C compiler, ...
+
+  * A POSIX + Single UNIX Specification compatible C library.
+
+  * asciidoc, xsltproc:
+    The AsciiDoc text document format is used to write the manpages.
+
+  * PostgreSQL server-side development files
+    (currently tested with PostgreSQL 9.1)
+
+Configuring / Compiling / Installing
+------------------------------------
+
+  To configure, build and install PostRR with the default settings, run
+  `./configure && make && make install'. For detailed, generic instructions
+  see INSTALL. For a complete list of configure options and their description,
+  run `./configure --help'.
+
+  By default, PostRR will be installed into `/opt/postrr'. You can adjust this
+  setting by specifying the `--prefix' configure option - see INSTALL for
+  details. If you pass DESTDIR=<path> to `make install', <path> will be
+  prefixed to all installation directories. This might be useful when creating
+  packages for PostRR.
+
+Author
+------
+
+  Sebastian "tokkee" Harl <sh@tokkee.org>
+
