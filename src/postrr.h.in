@@ -102,6 +102,25 @@ rrtimeslice_cmp(PG_FUNCTION_ARGS);
 int
 rrtimeslice_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2);
 
+/*
+ * CData data type
+ */
+
+struct cdata;
+typedef struct cdata cdata_t;
+
+#define PG_GETARG_CDATA_P(n) (cdata_t *)PG_GETARG_POINTER(n)
+#define PG_RETURN_CDATA_P(p) PG_RETURN_POINTER(p)
+
+Datum
+cdata_validate(PG_FUNCTION_ARGS);
+
+/* I/O functions */
+Datum
+cdata_in(PG_FUNCTION_ARGS);
+Datum
+cdata_out(PG_FUNCTION_ARGS);
+
 #endif /* ! POSTRR_H */
 
 /* vim: set tw=78 sw=4 ts=4 noexpandtab : */

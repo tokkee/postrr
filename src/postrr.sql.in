@@ -198,6 +198,35 @@ CREATE OPERATOR CLASS rrtimeslice_ops
 		OPERATOR 5 > ,
 		FUNCTION 1 RRTimeslice_cmp(rrtimeslice, rrtimeslice);
 
+CREATE TYPE CData;
+
+CREATE OR REPLACE FUNCTION CData_validate(integer)
+	RETURNS cstring
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_validate'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+-- this will abort the transaction in case the expected internal length does
+-- not match the actual length
+SELECT CData_validate(24);
+
+CREATE OR REPLACE FUNCTION CData_in(cstring, oid, integer)
+	RETURNS CData
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_in'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION CData_out(CData)
+	RETURNS cstring
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_out'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE TYPE CData (
+	INTERNALLENGTH = 24,
+	INPUT          = CData_in,
+	OUTPUT         = CData_out,
+	ALIGNMENT      = double,
+	STORAGE        = plain
+);
+
 COMMIT;
 
 SET client_min_messages TO DEFAULT;

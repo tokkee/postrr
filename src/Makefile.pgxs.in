@@ -28,6 +28,7 @@ MODULE_big=postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@
 MODULEDIR=contrib/$(MODULE)
 
 PG_OBJS=base.o \
+		cdata.o \
 		rrtimeslice.o \
 		utils/pg_spi.o
 
