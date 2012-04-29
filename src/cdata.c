@@ -150,7 +150,7 @@ cdata_in(PG_FUNCTION_ARGS)
 	else
 		data->cf = 0;
 
-	PG_RETURN_RRTIMESLICE_P(data);
+	PG_RETURN_CDATA_P(data);
 } /* cdata_in */
 
 Datum
