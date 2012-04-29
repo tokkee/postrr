@@ -219,13 +219,34 @@ CREATE OR REPLACE FUNCTION CData_out(CData)
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_out'
 	LANGUAGE 'C' IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION CData_typmodin(cstring[])
+	RETURNS integer
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_typmodin'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION CData_typmodout(integer)
+	RETURNS cstring
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_typmodout'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
 CREATE TYPE CData (
 	INTERNALLENGTH = 24,
 	INPUT          = CData_in,
 	OUTPUT         = CData_out,
+	TYPMOD_IN      = CData_typmodin,
+	TYPMOD_OUT     = CData_typmodout,
 	ALIGNMENT      = double,
 	STORAGE        = plain
 );
+
+CREATE OR REPLACE FUNCTION CData(cdata, integer, boolean)
+	RETURNS cdata
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_to_cdata'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE CAST (cdata AS cdata)
+	WITH FUNCTION CData(cdata, integer, boolean)
+	AS IMPLICIT;
 
 COMMIT;
 

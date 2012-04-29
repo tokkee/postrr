@@ -32,12 +32,28 @@
 #include "postrr.h"
 
 #include <errno.h>
+#include <string.h>
 
 #include <postgres.h>
 #include <fmgr.h>
 
 /* Postgres utilities */
+#include <catalog/pg_type.h>
 #include <utils/array.h>
+
+enum {
+	CF_AVG = 0,
+	CF_MIN = 1,
+	CF_MAX = 2
+};
+
+#define CF_TO_STR(cf) \
+	(((cf) == CF_AVG) \
+		? "AVG" \
+		: ((cf) == CF_MIN) \
+			? "MIN" \
+			: ((cf) == CF_MAX) \
+				? "MAX" : "UNKNOWN")
 
 /*
  * data type
@@ -175,6 +191,110 @@ cdata_out(PG_FUNCTION_ARGS)
 	result = pstrdup(cd_str);
 	PG_RETURN_CSTRING(result);
 } /* cdata_out */
+
+Datum
+cdata_typmodin(PG_FUNCTION_ARGS)
+{
+	ArrayType *tm_array;
+
+	Datum *elem_values;
+	int    n;
+	char  *cf_str;
+	int32  typmod = CF_AVG;
+
+	if (PG_NARGS() != 1)
+		ereport(ERROR, (
+					errmsg("cdata_typmodin() expects one argument"),
+					errhint("Usage: cdata_typmodin(array)")
+				));
+
+	tm_array = PG_GETARG_ARRAYTYPE_P(0);
+
+	if (ARR_ELEMTYPE(tm_array) != CSTRINGOID)
+		ereport(ERROR, (
+					errcode(ERRCODE_ARRAY_ELEMENT_ERROR),
+					errmsg("typmod array must be type cstring[]")
+				));
+
+	if (ARR_NDIM(tm_array) != 1)
+		ereport(ERROR, (
+					errcode(ERRCODE_ARRAY_SUBSCRIPT_ERROR),
+					errmsg("typmod array must be one-dimensional")
+				));
+
+	deconstruct_array(tm_array, CSTRINGOID,
+			/* elmlen = */ -2, /* elmbyval = */ false, /* elmalign = */ 'c',
+			&elem_values, /* nullsp = */ NULL, &n);
+
+	if (n != 1)
+		ereport(ERROR, (
+					errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+					errmsg("cdata typmod array must have one element")
+				));
+
+	cf_str = DatumGetCString(elem_values[0]);
+	if (! strcasecmp(cf_str, "AVG"))
+		typmod = CF_AVG;
+	else if (! strcasecmp(cf_str, "MIN"))
+		typmod = CF_MIN;
+	else if (! strcasecmp(cf_str, "MAX"))
+		typmod = CF_MAX;
+	else
+		ereport(ERROR, (
+					errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+					errmsg("invalid cdata typmod: %s", cf_str)
+				));
+
+	PG_RETURN_INT32(typmod);
+} /* cdata_typmodin */
+
+Datum
+cdata_typmodout(PG_FUNCTION_ARGS)
+{
+	int32 typmod;
+	char  tm_str[32];
+	char *result;
+
+	if (PG_NARGS() != 1)
+		ereport(ERROR, (
+					errmsg("cdata_typmodout() expects one argument"),
+					errhint("Usage: cdata_typmodout(typmod)")
+				));
+
+	typmod = PG_GETARG_INT32(0);
+	snprintf(tm_str, sizeof(tm_str), "('%s')", CF_TO_STR(typmod));
+	tm_str[sizeof(tm_str) - 1] = '\0';
+	result = pstrdup(tm_str);
+	PG_RETURN_CSTRING(result);
+} /* cdata_typmodout */
+
+Datum
+cdata_to_cdata(PG_FUNCTION_ARGS)
+{
+	cdata_t *data;
+	int32 typmod;
+
+	if (PG_NARGS() != 3)
+		ereport(ERROR, (
+					errmsg("cdata_to_cdata() "
+						"expects three arguments"),
+					errhint("Usage: cdata_to_cdata"
+						"(cdata, typmod, is_explicit)")
+				));
+
+	data   = PG_GETARG_CDATA_P(0);
+	typmod = PG_GETARG_INT32(1);
+
+	if ((data->cf >= 0) && (data->cf != typmod) && (data->val_num > 1))
+		ereport(ERROR, (
+					errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+					errmsg("invalid cast: cannot cast cdata "
+						"with different typmod (yet)")
+				));
+
+	data->cf = typmod;
+	PG_RETURN_CDATA_P(data);
+} /* cdata_to_cdata */
 
 /* vim: set tw=78 sw=4 ts=4 noexpandtab : */
 

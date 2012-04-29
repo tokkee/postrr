@@ -120,6 +120,14 @@ Datum
 cdata_in(PG_FUNCTION_ARGS);
 Datum
 cdata_out(PG_FUNCTION_ARGS);
+Datum
+cdata_typmodin(PG_FUNCTION_ARGS);
+Datum
+cdata_typmodout(PG_FUNCTION_ARGS);
+
+/* casts */
+Datum
+cdata_to_cdata(PG_FUNCTION_ARGS);
 
 #endif /* ! POSTRR_H */
 
