@@ -37,6 +37,14 @@ DROP TYPE RRTimeslice CASCADE;
 DROP FUNCTION IF EXISTS RRTimeslice_typmodin(cstring[]);
 DROP FUNCTION IF EXISTS RRTimeslice_typmodout(integer);
 
+DROP FUNCTION IF EXISTS CData_validate(integer);
+
+DROP CAST IF EXISTS (cdata AS cdata);
+DROP FUNCTION IF EXISTS CData(cdata, integer, boolean);
+DROP TYPE CData CASCADE;
+DROP FUNCTION IF EXISTS CData_typmodin(cstring[]);
+DROP FUNCTION IF EXISTS CData_typmodout(integer);
+
 DROP FUNCTION IF EXISTS PostRR_Version();
 
 DROP TABLE postrr.rrtimeslices;
