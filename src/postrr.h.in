@@ -128,6 +128,8 @@ cdata_typmodout(PG_FUNCTION_ARGS);
 /* casts */
 Datum
 cdata_to_cdata(PG_FUNCTION_ARGS);
+Datum
+int32_to_cdata(PG_FUNCTION_ARGS);
 
 #endif /* ! POSTRR_H */
 

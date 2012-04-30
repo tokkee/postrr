@@ -78,6 +78,7 @@ PG_FUNCTION_INFO_V1(cdata_typmodin);
 PG_FUNCTION_INFO_V1(cdata_typmodout);
 
 PG_FUNCTION_INFO_V1(cdata_to_cdata);
+PG_FUNCTION_INFO_V1(int32_to_cdata);
 
 /*
  * public API
@@ -295,6 +296,38 @@ cdata_to_cdata(PG_FUNCTION_ARGS)
 	data->cf = typmod;
 	PG_RETURN_CDATA_P(data);
 } /* cdata_to_cdata */
+
+Datum
+int32_to_cdata(PG_FUNCTION_ARGS)
+{
+	int32 i_val;
+	int32 typmod;
+
+	cdata_t *data;
+
+	if (PG_NARGS() != 3)
+		ereport(ERROR, (
+					errmsg("int32_to_cdata() expects three arguments"),
+					errhint("Usage: int32_to_cdata"
+						"(integer, typmod, is_explicit)")
+				));
+
+	i_val  = PG_GETARG_INT32(0);
+	typmod = PG_GETARG_INT32(1);
+
+	data = (cdata_t *)palloc0(sizeof(*data));
+
+	data->value     = (float8)i_val;
+	data->undef_num = 0;
+	data->val_num   = 1;
+
+	if (typmod >= 0)
+		data->cf = typmod;
+	else
+		data->cf = CF_AVG;
+
+	PG_RETURN_CDATA_P(data);
+} /* int32_to_cdata */
 
 /* vim: set tw=78 sw=4 ts=4 noexpandtab : */
 

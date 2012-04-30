@@ -248,6 +248,19 @@ CREATE CAST (cdata AS cdata)
 	WITH FUNCTION CData(cdata, integer, boolean)
 	AS IMPLICIT;
 
+CREATE CAST (numeric AS cdata)
+	WITH INOUT
+	AS ASSIGNMENT;
+
+CREATE OR REPLACE FUNCTION CData(integer, integer, boolean)
+	RETURNS cdata
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'int32_to_cdata'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE CAST (integer AS cdata)
+	WITH FUNCTION CData(integer, integer, boolean)
+	AS ASSIGNMENT;
+
 COMMIT;
 
 SET client_min_messages TO DEFAULT;
