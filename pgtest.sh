@@ -44,6 +44,11 @@ set -e
 
 case "$1" in
 	setup)
+		if test $# -ne 1; then
+			echo "Too many arguments!" >&2
+			echo "Usage: $0 setup" >&2
+			exit 1
+		fi
 		mkdir -p $TARGET/var/lib/postgresql/main
 		mkdir -p $TARGET/var/run/postgresql
 		mkdir -p $TARGET/var/log/postgresql/main
@@ -66,16 +71,24 @@ case "$1" in
 				export LD_PRELOAD="$LD_PRELOAD:$libreadline"
 			fi
 		fi
-		$BIN_DIR/psql -h $TARGET/var/run/postgresql/ -p 5435
+		shift
+		$BIN_DIR/psql -h $TARGET/var/run/postgresql/ -p 5435 "$@"
 		;;
 	stop)
+		if test $# -ne 1; then
+			echo "Too many arguments!" >&2
+			echo "Usage: $0 setup" >&2
+			exit 1
+		fi
 		$BIN_DIR/pg_ctl -D $TARGET/var/lib/postgresql/main stop
 		;;
 	start)
-		if test "$2" = "-B"; then
-			$BIN_DIR/pg_ctl -D $TARGET/var/lib/postgresql/main -l logfile -w start
+		shift
+		if test "$1" = "-B"; then
+			shift
+			$BIN_DIR/pg_ctl -D $TARGET/var/lib/postgresql/main -l logfile -w start "$@"
 		else
-			$BIN_DIR/postgres -D $TARGET/var/lib/postgresql/main
+			$BIN_DIR/postgres -D $TARGET/var/lib/postgresql/main "$@"
 		fi
 		;;
 	*)
