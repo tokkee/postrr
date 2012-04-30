@@ -60,7 +60,7 @@ enum {
  */
 
 struct cdata {
-	double value;
+	float8 value;
 	int32 undef_num;
 	int32 val_num;
 	int32 cf;
