@@ -135,6 +135,11 @@ CREATE OR REPLACE FUNCTION RRTimeslice_cmp(rrtimeslice, rrtimeslice)
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_cmp'
 	LANGUAGE 'C' IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION RRTimeslice_hash(rrtimeslice)
+	RETURNS integer
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_hash'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
 CREATE OPERATOR = (
 	LEFTARG    = RRTimeslice,
 	RIGHTARG   = RRTimeslice,
@@ -197,6 +202,11 @@ CREATE OPERATOR CLASS rrtimeslice_ops
 		OPERATOR 4 >= ,
 		OPERATOR 5 > ,
 		FUNCTION 1 RRTimeslice_cmp(rrtimeslice, rrtimeslice);
+
+CREATE OPERATOR CLASS rrtimeslice_hash_ops
+	FOR TYPE RRTimeslice USING hash AS
+		OPERATOR 1 = ,
+		FUNCTION 1 RRTimeslice_hash(rrtimeslice);
 
 CREATE TYPE CData;
 

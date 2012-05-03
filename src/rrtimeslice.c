@@ -39,6 +39,7 @@
 #include <fmgr.h>
 
 /* Postgres utilities */
+#include <access/hash.h>
 #include <executor/spi.h>
 #include <utils/array.h>
 #include <utils/datetime.h>
@@ -214,6 +215,7 @@ PG_FUNCTION_INFO_V1(rrtimeslice_gt);
 PG_FUNCTION_INFO_V1(rrtimeslice_le);
 PG_FUNCTION_INFO_V1(rrtimeslice_ge);
 PG_FUNCTION_INFO_V1(rrtimeslice_cmp);
+PG_FUNCTION_INFO_V1(rrtimeslice_hash);
 
 /*
  * public API
@@ -560,6 +562,13 @@ rrtimeslice_cmp(PG_FUNCTION_ARGS)
 
 	PG_RETURN_INT32(rrtimeslice_cmp_internal(ts1, ts2));
 } /* rrtimeslice_ge */
+
+Datum
+rrtimeslice_hash(PG_FUNCTION_ARGS)
+{
+	rrtimeslice_t *ts = PG_GETARG_RRTIMESLICE_P(0);
+	return hash_uint32(ts->seq);
+} /* rrtimeslice_hash */
 
 /* vim: set tw=78 sw=4 ts=4 noexpandtab : */
 

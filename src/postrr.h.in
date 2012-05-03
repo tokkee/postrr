@@ -94,6 +94,8 @@ Datum
 rrtimeslice_ge(PG_FUNCTION_ARGS);
 Datum
 rrtimeslice_cmp(PG_FUNCTION_ARGS);
+Datum
+rrtimeslice_hash(PG_FUNCTION_ARGS);
 
 /*
  * internal (not fmgr-callable) functions
