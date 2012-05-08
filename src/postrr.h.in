@@ -81,28 +81,28 @@ rrtimeslice_to_rrtimeslice(PG_FUNCTION_ARGS);
 
 /* comparison operators */
 Datum
-rrtimeslice_eq(PG_FUNCTION_ARGS);
+rrtimeslice_seq_eq(PG_FUNCTION_ARGS);
 Datum
-rrtimeslice_ne(PG_FUNCTION_ARGS);
+rrtimeslice_seq_ne(PG_FUNCTION_ARGS);
 Datum
-rrtimeslice_lt(PG_FUNCTION_ARGS);
+rrtimeslice_seq_lt(PG_FUNCTION_ARGS);
 Datum
-rrtimeslice_le(PG_FUNCTION_ARGS);
+rrtimeslice_seq_le(PG_FUNCTION_ARGS);
 Datum
-rrtimeslice_gt(PG_FUNCTION_ARGS);
+rrtimeslice_seq_gt(PG_FUNCTION_ARGS);
 Datum
-rrtimeslice_ge(PG_FUNCTION_ARGS);
+rrtimeslice_seq_ge(PG_FUNCTION_ARGS);
 Datum
-rrtimeslice_cmp(PG_FUNCTION_ARGS);
+rrtimeslice_seq_cmp(PG_FUNCTION_ARGS);
 Datum
-rrtimeslice_hash(PG_FUNCTION_ARGS);
+rrtimeslice_seq_hash(PG_FUNCTION_ARGS);
 
 /*
  * internal (not fmgr-callable) functions
  */
 
 int
-rrtimeslice_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2);
+rrtimeslice_seq_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2);
 
 /*
  * CData data type

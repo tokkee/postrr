@@ -208,14 +208,14 @@ PG_FUNCTION_INFO_V1(rrtimeslice_typmodout);
 
 PG_FUNCTION_INFO_V1(rrtimeslice_to_rrtimeslice);
 
-PG_FUNCTION_INFO_V1(rrtimeslice_eq);
-PG_FUNCTION_INFO_V1(rrtimeslice_ne);
-PG_FUNCTION_INFO_V1(rrtimeslice_lt);
-PG_FUNCTION_INFO_V1(rrtimeslice_gt);
-PG_FUNCTION_INFO_V1(rrtimeslice_le);
-PG_FUNCTION_INFO_V1(rrtimeslice_ge);
-PG_FUNCTION_INFO_V1(rrtimeslice_cmp);
-PG_FUNCTION_INFO_V1(rrtimeslice_hash);
+PG_FUNCTION_INFO_V1(rrtimeslice_seq_eq);
+PG_FUNCTION_INFO_V1(rrtimeslice_seq_ne);
+PG_FUNCTION_INFO_V1(rrtimeslice_seq_lt);
+PG_FUNCTION_INFO_V1(rrtimeslice_seq_gt);
+PG_FUNCTION_INFO_V1(rrtimeslice_seq_le);
+PG_FUNCTION_INFO_V1(rrtimeslice_seq_ge);
+PG_FUNCTION_INFO_V1(rrtimeslice_seq_cmp);
+PG_FUNCTION_INFO_V1(rrtimeslice_seq_hash);
 
 /*
  * public API
@@ -473,7 +473,7 @@ rrtimeslice_to_rrtimeslice(PG_FUNCTION_ARGS)
 } /* rrtimeslice_to_rrtimeslice */
 
 int
-rrtimeslice_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2)
+rrtimeslice_seq_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2)
 {
 	if ((! ts1) && (! ts2))
 		return 0;
@@ -494,81 +494,83 @@ rrtimeslice_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2)
 						"rrtimeslices with different typmods (yet)")
 				));
 
-	if (ts1->seq == ts2->seq)
+	if (ts1->seq < ts2->seq)
+		return -1;
+	else if (ts1->seq == ts2->seq)
 		return 0;
-
-	return timestamp_cmp_internal(ts1->tstamp, ts2->tstamp);
-} /* rrtimeslice_cmp_internal */
+	else
+		return 1;
+} /* rrtimeslice_seq_cmp_internal */
 
 Datum
-rrtimeslice_eq(PG_FUNCTION_ARGS)
+rrtimeslice_seq_eq(PG_FUNCTION_ARGS)
 {
 	rrtimeslice_t *ts1 = PG_GETARG_RRTIMESLICE_P(0);
 	rrtimeslice_t *ts2 = PG_GETARG_RRTIMESLICE_P(1);
 
-	PG_RETURN_BOOL(rrtimeslice_cmp_internal(ts1, ts2) == 0);
-} /* rrtimeslice_eq */
+	PG_RETURN_BOOL(rrtimeslice_seq_cmp_internal(ts1, ts2) == 0);
+} /* rrtimeslice_seq_eq */
 
 Datum
-rrtimeslice_ne(PG_FUNCTION_ARGS)
+rrtimeslice_seq_ne(PG_FUNCTION_ARGS)
 {
 	rrtimeslice_t *ts1 = PG_GETARG_RRTIMESLICE_P(0);
 	rrtimeslice_t *ts2 = PG_GETARG_RRTIMESLICE_P(1);
 
-	PG_RETURN_BOOL(rrtimeslice_cmp_internal(ts1, ts2) != 0);
-} /* rrtimeslice_ne */
+	PG_RETURN_BOOL(rrtimeslice_seq_cmp_internal(ts1, ts2) != 0);
+} /* rrtimeslice_seq_ne */
 
 Datum
-rrtimeslice_lt(PG_FUNCTION_ARGS)
+rrtimeslice_seq_lt(PG_FUNCTION_ARGS)
 {
 	rrtimeslice_t *ts1 = PG_GETARG_RRTIMESLICE_P(0);
 	rrtimeslice_t *ts2 = PG_GETARG_RRTIMESLICE_P(1);
 
-	PG_RETURN_BOOL(rrtimeslice_cmp_internal(ts1, ts2) < 0);
-} /* rrtimeslice_lt */
+	PG_RETURN_BOOL(rrtimeslice_seq_cmp_internal(ts1, ts2) < 0);
+} /* rrtimeslice_seq_lt */
 
 Datum
-rrtimeslice_le(PG_FUNCTION_ARGS)
+rrtimeslice_seq_le(PG_FUNCTION_ARGS)
 {
 	rrtimeslice_t *ts1 = PG_GETARG_RRTIMESLICE_P(0);
 	rrtimeslice_t *ts2 = PG_GETARG_RRTIMESLICE_P(1);
 
-	PG_RETURN_BOOL(rrtimeslice_cmp_internal(ts1, ts2) <= 0);
-} /* rrtimeslice_le */
+	PG_RETURN_BOOL(rrtimeslice_seq_cmp_internal(ts1, ts2) <= 0);
+} /* rrtimeslice_seq_le */
 
 Datum
-rrtimeslice_gt(PG_FUNCTION_ARGS)
+rrtimeslice_seq_gt(PG_FUNCTION_ARGS)
 {
 	rrtimeslice_t *ts1 = PG_GETARG_RRTIMESLICE_P(0);
 	rrtimeslice_t *ts2 = PG_GETARG_RRTIMESLICE_P(1);
 
-	PG_RETURN_BOOL(rrtimeslice_cmp_internal(ts1, ts2) > 0);
-} /* rrtimeslice_gt */
+	PG_RETURN_BOOL(rrtimeslice_seq_cmp_internal(ts1, ts2) > 0);
+} /* rrtimeslice_seq_gt */
 
 Datum
-rrtimeslice_ge(PG_FUNCTION_ARGS)
+rrtimeslice_seq_ge(PG_FUNCTION_ARGS)
 {
 	rrtimeslice_t *ts1 = PG_GETARG_RRTIMESLICE_P(0);
 	rrtimeslice_t *ts2 = PG_GETARG_RRTIMESLICE_P(1);
 
-	PG_RETURN_BOOL(rrtimeslice_cmp_internal(ts1, ts2) >= 0);
-} /* rrtimeslice_ge */
+	PG_RETURN_BOOL(rrtimeslice_seq_cmp_internal(ts1, ts2) >= 0);
+} /* rrtimeslice_seq_ge */
 
 Datum
-rrtimeslice_cmp(PG_FUNCTION_ARGS)
+rrtimeslice_seq_cmp(PG_FUNCTION_ARGS)
 {
 	rrtimeslice_t *ts1 = PG_GETARG_RRTIMESLICE_P(0);
 	rrtimeslice_t *ts2 = PG_GETARG_RRTIMESLICE_P(1);
 
-	PG_RETURN_INT32(rrtimeslice_cmp_internal(ts1, ts2));
-} /* rrtimeslice_ge */
+	PG_RETURN_INT32(rrtimeslice_seq_cmp_internal(ts1, ts2));
+} /* rrtimeslice_seq_ge */
 
 Datum
-rrtimeslice_hash(PG_FUNCTION_ARGS)
+rrtimeslice_seq_hash(PG_FUNCTION_ARGS)
 {
 	rrtimeslice_t *ts = PG_GETARG_RRTIMESLICE_P(0);
 	return hash_uint32(ts->seq);
-} /* rrtimeslice_hash */
+} /* rrtimeslice_seq_hash */
 
 /* vim: set tw=78 sw=4 ts=4 noexpandtab : */
 

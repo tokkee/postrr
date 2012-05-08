@@ -100,50 +100,50 @@ CREATE CAST (rrtimeslice AS rrtimeslice)
 	WITH FUNCTION RRTimeslice(rrtimeslice, integer, boolean)
 	AS IMPLICIT;
 
-CREATE OR REPLACE FUNCTION RRTimeslice_eq(rrtimeslice, rrtimeslice)
+CREATE OR REPLACE FUNCTION rrtimeslice_seq_eq(rrtimeslice, rrtimeslice)
 	RETURNS boolean
-	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_eq'
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_eq'
 	LANGUAGE 'C' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION RRTimeslice_ne(rrtimeslice, rrtimeslice)
+CREATE OR REPLACE FUNCTION rrtimeslice_seq_ne(rrtimeslice, rrtimeslice)
 	RETURNS boolean
-	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_ne'
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_ne'
 	LANGUAGE 'C' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION RRTimeslice_lt(rrtimeslice, rrtimeslice)
+CREATE OR REPLACE FUNCTION rrtimeslice_seq_lt(rrtimeslice, rrtimeslice)
 	RETURNS boolean
-	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_lt'
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_lt'
 	LANGUAGE 'C' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION RRTimeslice_le(rrtimeslice, rrtimeslice)
+CREATE OR REPLACE FUNCTION rrtimeslice_seq_le(rrtimeslice, rrtimeslice)
 	RETURNS boolean
-	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_le'
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_le'
 	LANGUAGE 'C' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION RRTimeslice_gt(rrtimeslice, rrtimeslice)
+CREATE OR REPLACE FUNCTION rrtimeslice_seq_gt(rrtimeslice, rrtimeslice)
 	RETURNS boolean
-	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_gt'
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_gt'
 	LANGUAGE 'C' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION RRTimeslice_ge(rrtimeslice, rrtimeslice)
+CREATE OR REPLACE FUNCTION rrtimeslice_seq_ge(rrtimeslice, rrtimeslice)
 	RETURNS boolean
-	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_ge'
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_ge'
 	LANGUAGE 'C' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION RRTimeslice_cmp(rrtimeslice, rrtimeslice)
+CREATE OR REPLACE FUNCTION rrtimeslice_seq_cmp(rrtimeslice, rrtimeslice)
 	RETURNS integer
-	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_cmp'
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_cmp'
 	LANGUAGE 'C' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION RRTimeslice_hash(rrtimeslice)
+CREATE OR REPLACE FUNCTION rrtimeslice_seq_hash(rrtimeslice)
 	RETURNS integer
-	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_hash'
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_hash'
 	LANGUAGE 'C' IMMUTABLE STRICT;
 
 CREATE OPERATOR = (
 	LEFTARG    = RRTimeslice,
 	RIGHTARG   = RRTimeslice,
-	PROCEDURE  = RRTimeslice_eq,
+	PROCEDURE  = rrtimeslice_seq_eq,
 	COMMUTATOR = =,
 	NEGATOR    = <>,
 	RESTRICT   = eqsel
@@ -152,7 +152,7 @@ CREATE OPERATOR = (
 CREATE OPERATOR <> (
 	LEFTARG    = RRTimeslice,
 	RIGHTARG   = RRTimeslice,
-	PROCEDURE  = RRTimeslice_ne,
+	PROCEDURE  = rrtimeslice_seq_ne,
 	COMMUTATOR = <>,
 	NEGATOR    = =,
 	RESTRICT   = neqsel
@@ -161,7 +161,7 @@ CREATE OPERATOR <> (
 CREATE OPERATOR < (
 	LEFTARG    = RRTimeslice,
 	RIGHTARG   = RRTimeslice,
-	PROCEDURE  = RRTimeslice_lt,
+	PROCEDURE  = rrtimeslice_seq_lt,
 	COMMUTATOR = >,
 	NEGATOR    = <=,
 	RESTRICT   = scalarltsel
@@ -170,7 +170,7 @@ CREATE OPERATOR < (
 CREATE OPERATOR <= (
 	LEFTARG    = RRTimeslice,
 	RIGHTARG   = RRTimeslice,
-	PROCEDURE  = RRTimeslice_le,
+	PROCEDURE  = rrtimeslice_seq_le,
 	COMMUTATOR = >=,
 	NEGATOR    = <,
 	RESTRICT   = scalarltsel
@@ -179,7 +179,7 @@ CREATE OPERATOR <= (
 CREATE OPERATOR > (
 	LEFTARG    = RRTimeslice,
 	RIGHTARG   = RRTimeslice,
-	PROCEDURE  = RRTimeslice_gt,
+	PROCEDURE  = rrtimeslice_seq_gt,
 	COMMUTATOR = <,
 	NEGATOR    = >=,
 	RESTRICT   = scalargtsel
@@ -188,7 +188,7 @@ CREATE OPERATOR > (
 CREATE OPERATOR >= (
 	LEFTARG    = RRTimeslice,
 	RIGHTARG   = RRTimeslice,
-	PROCEDURE  = RRTimeslice_ge,
+	PROCEDURE  = rrtimeslice_seq_ge,
 	COMMUTATOR = <=,
 	NEGATOR    = >,
 	RESTRICT   = scalargtsel
@@ -201,12 +201,12 @@ CREATE OPERATOR CLASS rrtimeslice_ops
 		OPERATOR 3 = ,
 		OPERATOR 4 >= ,
 		OPERATOR 5 > ,
-		FUNCTION 1 RRTimeslice_cmp(rrtimeslice, rrtimeslice);
+		FUNCTION 1 rrtimeslice_seq_cmp(rrtimeslice, rrtimeslice);
 
 CREATE OPERATOR CLASS rrtimeslice_hash_ops
 	FOR TYPE RRTimeslice USING hash AS
 		OPERATOR 1 = ,
-		FUNCTION 1 RRTimeslice_hash(rrtimeslice);
+		FUNCTION 1 rrtimeslice_seq_hash(rrtimeslice);
 
 CREATE TYPE CData;
 
