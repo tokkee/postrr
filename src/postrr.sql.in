@@ -100,6 +100,15 @@ CREATE CAST (rrtimeslice AS rrtimeslice)
 	WITH FUNCTION RRTimeslice(rrtimeslice, integer, boolean)
 	AS IMPLICIT;
 
+CREATE OR REPLACE FUNCTION Tstamp(rrtimeslice)
+	RETURNS timestamp
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_to_timestamp'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE CAST (rrtimeslice AS timestamp)
+	WITH FUNCTION Tstamp(rrtimeslice);
+	-- EXPLICIT
+
 CREATE OR REPLACE FUNCTION rrtimeslice_seq_eq(rrtimeslice, rrtimeslice)
 	RETURNS boolean
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_eq'

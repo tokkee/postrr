@@ -33,6 +33,8 @@ DROP FUNCTION IF EXISTS RRTimeslice_validate(integer);
 
 DROP CAST IF EXISTS (rrtimeslice AS rrtimeslice);
 DROP FUNCTION IF EXISTS RRTimeslice(rrtimeslice, integer, boolean);
+DROP CAST IF EXISTS (rrtimeslice AS timestamp);
+DROP FUNCTION IF EXISTS Tstamp(rrtimeslice);
 DROP TYPE RRTimeslice CASCADE;
 DROP FUNCTION IF EXISTS RRTimeslice_typmodin(cstring[]);
 DROP FUNCTION IF EXISTS RRTimeslice_typmodout(integer);

@@ -207,6 +207,7 @@ PG_FUNCTION_INFO_V1(rrtimeslice_typmodin);
 PG_FUNCTION_INFO_V1(rrtimeslice_typmodout);
 
 PG_FUNCTION_INFO_V1(rrtimeslice_to_rrtimeslice);
+PG_FUNCTION_INFO_V1(rrtimeslice_to_timestamp);
 
 PG_FUNCTION_INFO_V1(rrtimeslice_seq_eq);
 PG_FUNCTION_INFO_V1(rrtimeslice_seq_ne);
@@ -471,6 +472,23 @@ rrtimeslice_to_rrtimeslice(PG_FUNCTION_ARGS)
 
 	PG_RETURN_RRTIMESLICE_P(tslice);
 } /* rrtimeslice_to_rrtimeslice */
+
+Datum
+rrtimeslice_to_timestamp(PG_FUNCTION_ARGS)
+{
+	rrtimeslice_t *tslice;
+
+	if (PG_NARGS() != 1)
+		ereport(ERROR, (
+					errmsg("rrtimeslice_to_timestamp() "
+						"expects one argument"),
+					errhint("Usage: rrtimeslice_to_timestamp"
+						"(rrtimeslice)")
+				));
+
+	tslice = PG_GETARG_RRTIMESLICE_P(0);
+	PG_RETURN_TIMESTAMP(tslice->tstamp);
+} /* rrtimeslice_to_timestamp */
 
 int
 rrtimeslice_seq_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2)
