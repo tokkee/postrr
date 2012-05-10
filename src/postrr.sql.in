@@ -280,6 +280,15 @@ CREATE CAST (integer AS cdata)
 	WITH FUNCTION CData(integer, integer, boolean)
 	AS ASSIGNMENT;
 
+CREATE OR REPLACE FUNCTION Float8(cdata)
+	RETURNS double precision
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_to_float8'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE CAST (cdata AS double precision)
+	WITH FUNCTION Float8(cdata);
+	-- EXPLICIT
+
 CREATE OR REPLACE FUNCTION CData_update(cdata, cdata)
 	RETURNS cdata
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_update'

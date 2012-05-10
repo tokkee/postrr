@@ -134,6 +134,8 @@ Datum
 cdata_to_cdata(PG_FUNCTION_ARGS);
 Datum
 int32_to_cdata(PG_FUNCTION_ARGS);
+Datum
+cdata_to_float8(PG_FUNCTION_ARGS);
 
 /* aux. functions */
 Datum

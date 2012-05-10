@@ -79,6 +79,7 @@ PG_FUNCTION_INFO_V1(cdata_typmodout);
 
 PG_FUNCTION_INFO_V1(cdata_to_cdata);
 PG_FUNCTION_INFO_V1(int32_to_cdata);
+PG_FUNCTION_INFO_V1(cdata_to_float8);
 
 PG_FUNCTION_INFO_V1(cdata_update);
 
@@ -330,6 +331,21 @@ int32_to_cdata(PG_FUNCTION_ARGS)
 
 	PG_RETURN_CDATA_P(data);
 } /* int32_to_cdata */
+
+Datum
+cdata_to_float8(PG_FUNCTION_ARGS)
+{
+	cdata_t *data;
+
+	if (PG_NARGS() != 1)
+		ereport(ERROR, (
+					errmsg("cdata_to_float8() expects one argument"),
+					errhint("Usage: cdata_to_float8(cdata)")
+				));
+
+	data = PG_GETARG_CDATA_P(0);
+	PG_RETURN_FLOAT8(data->value);
+} /* cdata_to_float8 */
 
 Datum
 cdata_update(PG_FUNCTION_ARGS)
