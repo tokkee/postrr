@@ -135,6 +135,10 @@ cdata_to_cdata(PG_FUNCTION_ARGS);
 Datum
 int32_to_cdata(PG_FUNCTION_ARGS);
 
+/* aux. functions */
+Datum
+cdata_update(PG_FUNCTION_ARGS);
+
 #endif /* ! POSTRR_H */
 
 /* vim: set tw=78 sw=4 ts=4 noexpandtab : */

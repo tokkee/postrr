@@ -80,6 +80,8 @@ PG_FUNCTION_INFO_V1(cdata_typmodout);
 PG_FUNCTION_INFO_V1(cdata_to_cdata);
 PG_FUNCTION_INFO_V1(int32_to_cdata);
 
+PG_FUNCTION_INFO_V1(cdata_update);
+
 /*
  * public API
  */
@@ -328,6 +330,57 @@ int32_to_cdata(PG_FUNCTION_ARGS)
 
 	PG_RETURN_CDATA_P(data);
 } /* int32_to_cdata */
+
+Datum
+cdata_update(PG_FUNCTION_ARGS)
+{
+	cdata_t *data;
+	cdata_t *update;
+
+	if (PG_NARGS() != 2)
+		ereport(ERROR, (
+					errmsg("cdata_update() expects two arguments"),
+					errhint("Usage: cdata_update(cdata, cdata)")
+				));
+
+	data   = PG_GETARG_CDATA_P(0);
+	update = PG_GETARG_CDATA_P(1);
+
+	if ((data->cf != update->cf) && (update->val_num > 1))
+		ereport(ERROR, (
+					errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+					errmsg("invalid update value: incompatible "
+						"consolidation function")
+				));
+
+	switch (data->cf) {
+		case CF_AVG:
+			data->value = (data->value * (data->val_num - data->undef_num))
+				+ (update->value * (update->val_num - update->undef_num));
+			data->value /= (data->val_num - data->undef_num)
+					+  (update->val_num - update->undef_num);
+			break;
+		case CF_MIN:
+			data->value = (data->value <= update->value)
+				? data->value : update->value;
+			break;
+		case CF_MAX:
+			data->value = (data->value >= update->value)
+				? data->value : update->value;
+			break;
+		default:
+			ereport(ERROR, (
+						errcode(ERRCODE_DATA_CORRUPTED),
+						errmsg("unknown consolidation function %d",
+							data->cf)
+					));
+			break;
+	}
+
+	data->undef_num += update->undef_num;
+	data->val_num   += update->val_num;
+	PG_RETURN_CDATA_P(data);
+} /* cdata_update */
 
 /* vim: set tw=78 sw=4 ts=4 noexpandtab : */
 
