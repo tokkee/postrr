@@ -29,5 +29,7 @@
 
 COMMENT ON TYPE RRTimeslice IS 'postrr type: A timeslice implementing round-robin features. It is defined by the length of the slice and the number of slices before wrapping around.';
 
+COMMENT ON TYPE CData IS 'cdata type: A floating point data type (double precision) implementing consolidation functions.';
+
 -- vim: set tw=78 sw=4 ts=4 noexpandtab :
 
