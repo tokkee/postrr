@@ -186,15 +186,15 @@ build_documentation="yes"
 have_xsltproc="yes"
 AC_PATH_PROG([XSLTPROC], [xsltproc])
 if test "x$XSLTPROC" = "x"; then
-       have_xsltproc="no"
-       build_documentation="no (missing xsltproc)"
+	have_xsltproc="no"
+	build_documentation="no (missing xsltproc)"
 fi
 
 have_a2x="yes"
 AC_PATH_PROG([A2X], [a2x])
 if test "x$A2X" = "x"; then
-       have_a2x="no"
-       build_documentation="no (missing a2x)"
+	have_a2x="no"
+	build_documentation="no (missing a2x)"
 fi
 AC_SUBST([A2X])
 
@@ -210,6 +210,7 @@ if test "x$PG_CONFIG" = "x"; then
 		AC_MSG_ERROR([could not find pg_config in \$PATH; rerun configure with the --with-pgconfig parameter.])
 	fi
 else
+	AC_MSG_CHECKING([pg_config usability])
 	if test "x$PG_CONFIG" = "xyes" -o "x$PG_CONFIG" = "xno"; then
 		AC_MSG_ERROR([please specify a parameter for --with-pgconfig])
 	else
@@ -217,14 +218,17 @@ else
 			AC_MSG_ERROR([the specified path to pg_config does not exist: $PG_CONFIG])
 		fi
 	fi
+	AC_MSG_RESULT([yes])
 fi
 AC_SUBST([PG_CONFIG])
 
+AC_MSG_CHECKING([for pgxs.mk])
 PGXS=`$PG_CONFIG --pgxs`
 if ! test -f "$PGXS"; then
 	AC_MSG_ERROR([could not find PGXS Makefile: '$PGXS'])
 fi
 AC_SUBST([PGXS])
+AC_MSG_RESULT($PGXS)
 
 PG_VERSION=`$PG_CONFIG --version`
 
