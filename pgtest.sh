@@ -58,7 +58,7 @@ case "$1" in
 		sed -r -i -e "s/^#dynamic_library_path = '\\\$libdir'/dynamic_library_path = '\$libdir:$PWD_esc\/src'/" $TARGET/var/lib/postgresql/main/postgresql.conf
 		sed -r -i -e "s/^#unix_socket_directory = ''/unix_socket_directory = '$TARGET_esc\/var\/run\/postgresql'/" $TARGET/var/lib/postgresql/main/postgresql.conf
 		$0 start -B
-		$BIN_DIR/createdb -e -h $TARGET/var/run/postgresql/ -p 5435 tokkee
+		$BIN_DIR/createdb -e -h $TARGET/var/run/postgresql/ -p 5435 "$( id -un )"
 		$0 stop
 		;;
 	client)
