@@ -200,7 +200,7 @@ AC_SUBST([A2X])
 
 dnl pg_config
 AC_ARG_WITH([pgconfig],
-		[AS_HELP_STRING([--with-pgconfig=FILE], [foo bar],)],
+		[AS_HELP_STRING([--with-pgconfig=FILE], [path to pg_config],)],
 		[PG_CONFIG="$withval"], [PG_CONFIG=""])
 
 if test "x$PG_CONFIG" = "x"; then
