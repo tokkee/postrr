@@ -23,6 +23,10 @@ archives:
   A timeslice implementing round-robin features. It is defined by the length
   of the slice and the number of slices before wrapping around.
 
+* CData: +
+  A floating point data type (double precision) implementing consolidation
+  functions.
+
 AUTHOR
 ------
 PostRR was written by Sebastian "tokkee" Harl <sh@tokkee.org>.
