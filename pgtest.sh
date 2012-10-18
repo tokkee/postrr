@@ -53,12 +53,12 @@ case "$1" in
 		mkdir -p $TARGET/var/run/postgresql
 		mkdir -p $TARGET/var/log/postgresql/main
 		$BIN_DIR/initdb -D $TARGET/var/lib/postgresql/main
-		sed -r -i -e 's/^#port = 5432/port = 5435/' \
+		sed -r -i -e 's/^#port = 5432/port = 2345/' \
 			$TARGET/var/lib/postgresql/main/postgresql.conf
 		sed -r -i -e "s/^#dynamic_library_path = '\\\$libdir'/dynamic_library_path = '\$libdir:$PWD_esc\/src'/" $TARGET/var/lib/postgresql/main/postgresql.conf
 		sed -r -i -e "s/^#unix_socket_directory = ''/unix_socket_directory = '$TARGET_esc\/var\/run\/postgresql'/" $TARGET/var/lib/postgresql/main/postgresql.conf
 		$0 start -B
-		$BIN_DIR/createdb -e -h $TARGET/var/run/postgresql/ -p 5435 "$( id -un )"
+		$BIN_DIR/createdb -e -h $TARGET/var/run/postgresql/ -p 2345 "$( id -un )"
 		$0 stop
 		;;
 	client)
@@ -72,7 +72,7 @@ case "$1" in
 			fi
 		fi
 		shift
-		$BIN_DIR/psql -h $TARGET/var/run/postgresql/ -p 5435 "$@"
+		$BIN_DIR/psql -h $TARGET/var/run/postgresql/ -p 2345 "$@"
 		;;
 	stop)
 		if test $# -ne 1; then
