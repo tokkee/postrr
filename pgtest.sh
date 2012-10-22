@@ -107,6 +107,9 @@ case "$1" in
 		echo "Environment variables:"
 		echo "  - TARGET"
 		echo "    Target directory of the PostgreSQL test setup."
+		if test "$1" = "help"; then
+			exit 0
+		fi
 		exit 1
 		;;
 esac
