@@ -77,7 +77,7 @@ case "$1" in
 	stop)
 		if test $# -ne 1; then
 			echo "Too many arguments!" >&2
-			echo "Usage: $0 setup" >&2
+			echo "Usage: $0 stop" >&2
 			exit 1
 		fi
 		$BIN_DIR/pg_ctl -D $TARGET/var/lib/postgresql/main stop
@@ -93,6 +93,20 @@ case "$1" in
 		;;
 	*)
 		echo "Usage: $0 setup|client|stop|start" >&2
+		echo ""
+		echo "  - setup"
+		echo "    Set up a new PostgreSQL server listening on port 2345."
+		echo "  - client [<psql args>]"
+		echo "    Start a PostgreSQL interactive terminal connected to the"
+		echo "    PostgreSQL server on port 2345."
+		echo "  - start [-B [<postgres args>]]"
+		echo "    Start the PostgreSQL server."
+		echo "  - stop"
+		echo "    Stop the PostgreSQL server."
+		echo ""
+		echo "Environment variables:"
+		echo "  - TARGET"
+		echo "    Target directory of the PostgreSQL test setup."
 		exit 1
 		;;
 esac
