@@ -106,6 +106,8 @@ case "$1" in
 		echo "    Start the PostgreSQL server."
 		echo "  - stop"
 		echo "    Stop the PostgreSQL server."
+		echo "  - restart"
+		echo "    Restart a background PostgreSQL server process."
 		echo ""
 		echo "Environment variables:"
 		echo "  - TARGET"
