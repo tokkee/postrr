@@ -91,6 +91,9 @@ case "$1" in
 			$BIN_DIR/postgres -D $TARGET/var/lib/postgresql/main "$@"
 		fi
 		;;
+	restart)
+		$0 stop && $0 start -B
+		;;
 	*)
 		echo "Usage: $0 setup|client|stop|start" >&2
 		echo ""
