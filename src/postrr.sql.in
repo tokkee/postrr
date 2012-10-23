@@ -302,6 +302,78 @@ CREATE OR REPLACE FUNCTION CData_update(cdata, cdata)
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_update'
 	LANGUAGE 'C' IMMUTABLE;
 
+CREATE OR REPLACE FUNCTION PostRR_update(name, name, name, timestamp, double precision)
+	RETURNS cdata
+	LANGUAGE plpgsql
+	AS $$
+DECLARE
+	tbl ALIAS FOR $1;
+	tscol ALIAS FOR $2;
+	vcol ALIAS FOR $3;
+	ts ALIAS FOR $4;
+	value ALIAS FOR $5;
+	ts_str text;
+	v_str text;
+	update_qry text;
+	newts rrtimeslice;
+	new cdata;
+BEGIN
+	tscol  := quote_ident(tscol);
+	vcol   := quote_ident(vcol);
+	ts_str := quote_literal(ts);
+	v_str  := quote_literal(value);
+
+	update_qry = 'CData_update(' || vcol || ', ' || v_str || ')';
+
+	BEGIN
+		EXECUTE 'UPDATE ' || tbl
+			|| ' SET ' || tscol || ' = ' || ts_str
+			|| ', ' || vcol || ' = ' || update_qry
+			|| ' WHERE ' || tscol || ' = ' || ts_str
+			|| ' RETURNING ' || tscol || ', ' || vcol
+			INTO STRICT newts, new;
+
+		EXCEPTION
+			WHEN NO_DATA_FOUND THEN
+				EXECUTE 'INSERT INTO ' || tbl
+					|| ' (' || tscol || ', ' || vcol
+					|| ') VALUES (' || ts_str || ', ' || v_str
+					|| ') RETURNING ' || tscol || ', ' || vcol
+					INTO newts, new;
+				-- use strict again; on exception retry?
+			WHEN TOO_MANY_ROWS THEN
+				RAISE EXCEPTION '% is not unique in %.%', ts_str, tbl, tscol;
+	END;
+	RETURN new;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION PostRR_update(text, timestamp, double precision)
+	RETURNS SETOF cdata
+	LANGUAGE plpgsql
+	AS $$
+DECLARE
+	rraname ALIAS FOR $1;
+	ts ALIAS FOR $2;
+	value ALIAS FOR $3;
+	adef RECORD;
+	new cdata;
+BEGIN
+	FOR adef IN SELECT tbl, tscol, vcol FROM postrr.rrarchives
+			WHERE postrr.rrarchives.rraname = $1 LOOP
+		EXECUTE 'SELECT PostRR_update('
+			|| quote_literal(adef.tbl) || ', '
+			|| quote_literal(adef.tscol) || ', '
+			|| quote_literal(adef.vcol) || ', '
+			|| quote_literal(ts) || ', '
+			|| quote_literal(value) || ')'
+			INTO new;
+		RETURN NEXT new;
+	END LOOP;
+	RETURN;
+END;
+$$;
+
 COMMIT;
 
 SET client_min_messages TO DEFAULT;
