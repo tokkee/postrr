@@ -292,7 +292,7 @@ CREATE CAST (cdata AS double precision)
 CREATE OR REPLACE FUNCTION CData_update(cdata, cdata)
 	RETURNS cdata
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_update'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE 'C' IMMUTABLE;
 
 COMMIT;
 
