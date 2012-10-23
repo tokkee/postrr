@@ -189,8 +189,9 @@ cdata_out(PG_FUNCTION_ARGS)
 
 	data = PG_GETARG_CDATA_P(0);
 
-	snprintf(cd_str, sizeof(cd_str), "%g (U:%i/%i)",
-			data->value, data->undef_num, data->val_num);
+	snprintf(cd_str, sizeof(cd_str), "%g (%s U:%i/%i)",
+			data->value, CF_TO_STR(data->cf),
+			data->undef_num, data->val_num);
 
 	result = pstrdup(cd_str);
 	PG_RETURN_CSTRING(result);
