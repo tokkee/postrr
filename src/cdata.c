@@ -366,6 +366,9 @@ cdata_update(PG_FUNCTION_ARGS)
 	if (! data)
 		PG_RETURN_CDATA_P(update);
 
+	if (! update)
+		PG_RETURN_CDATA_P(data);
+
 	if ((data->cf != update->cf) && (update->val_num > 1))
 		ereport(ERROR, (
 					errcode(ERRCODE_INVALID_PARAMETER_VALUE),
