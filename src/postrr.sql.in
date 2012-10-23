@@ -45,6 +45,14 @@ CREATE TABLE postrr.rrtimeslices (
 	tsnum integer NOT NULL
 );
 
+CREATE TABLE postrr.rrarchives (
+	rraname text NOT NULL,
+	tbl name NOT NULL,
+	tscol name NOT NULL,
+	vcol name NOT NULL,
+	UNIQUE (rraname, tbl, tscol, vcol)
+);
+
 CREATE OR REPLACE FUNCTION PostRR_Version()
 	RETURNS cstring
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'postrr_version'
