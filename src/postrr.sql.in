@@ -108,13 +108,13 @@ CREATE CAST (rrtimeslice AS rrtimeslice)
 	WITH FUNCTION RRTimeslice(rrtimeslice, integer, boolean)
 	AS IMPLICIT;
 
-CREATE OR REPLACE FUNCTION Tstamp(rrtimeslice)
-	RETURNS timestamp
-	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_to_timestamp'
+CREATE OR REPLACE FUNCTION Tstamptz(rrtimeslice)
+	RETURNS timestamptz
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_to_timestamptz'
 	LANGUAGE 'C' IMMUTABLE STRICT;
 
-CREATE CAST (rrtimeslice AS timestamp)
-	WITH FUNCTION Tstamp(rrtimeslice);
+CREATE CAST (rrtimeslice AS timestamptz)
+	WITH FUNCTION Tstamptz(rrtimeslice);
 	-- EXPLICIT
 
 CREATE OR REPLACE FUNCTION rrtimeslice_seq_eq(rrtimeslice, rrtimeslice)
@@ -302,7 +302,7 @@ CREATE OR REPLACE FUNCTION CData_update(cdata, cdata)
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_update'
 	LANGUAGE 'C' IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION PostRR_update(name, name, name, timestamp, double precision)
+CREATE OR REPLACE FUNCTION PostRR_update(name, name, name, timestamptz, double precision)
 	RETURNS cdata
 	LANGUAGE plpgsql
 	AS $$
@@ -348,7 +348,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION PostRR_update(text, timestamp, double precision)
+CREATE OR REPLACE FUNCTION PostRR_update(text, timestamptz, double precision)
 	RETURNS SETOF cdata
 	LANGUAGE plpgsql
 	AS $$

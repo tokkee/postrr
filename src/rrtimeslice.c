@@ -59,7 +59,7 @@
  */
 
 struct rrtimeslice {
-	Timestamp tstamp;
+	TimestampTz tstamp;
 	int32  tsid;
 	uint32 seq;
 };
@@ -207,7 +207,7 @@ PG_FUNCTION_INFO_V1(rrtimeslice_typmodin);
 PG_FUNCTION_INFO_V1(rrtimeslice_typmodout);
 
 PG_FUNCTION_INFO_V1(rrtimeslice_to_rrtimeslice);
-PG_FUNCTION_INFO_V1(rrtimeslice_to_timestamp);
+PG_FUNCTION_INFO_V1(rrtimeslice_to_timestamptz);
 
 PG_FUNCTION_INFO_V1(rrtimeslice_seq_eq);
 PG_FUNCTION_INFO_V1(rrtimeslice_seq_ne);
@@ -259,7 +259,7 @@ rrtimeslice_in(PG_FUNCTION_ARGS)
 {
 	rrtimeslice_t *tslice;
 
-	Timestamp tstamp = 0;
+	TimestampTz tstamp = 0;
 	int32 typmod;
 
 	struct pg_tm tm;
@@ -295,7 +295,7 @@ rrtimeslice_in(PG_FUNCTION_ARGS)
 
 	switch (dtype) {
 		case DTK_DATE:
-			if (tm2timestamp(&tm, fsec, NULL, &tstamp))
+			if (tm2timestamp(&tm, fsec, &tz, &tstamp))
 				ereport(ERROR, (
 							errcode(ERRCODE_DATETIME_VALUE_OUT_OF_RANGE),
 							errmsg("timestamp out of range: %s", time_str)
@@ -334,7 +334,9 @@ rrtimeslice_out(PG_FUNCTION_ARGS)
 
 	struct pg_tm tm;
 	fsec_t fsec = 0;
-	char *tz = NULL;
+	int tz = 0;
+
+	char *tz_str = NULL;
 
 	char  ts_str[MAXDATELEN + 1];
 	char  buf_ts[MAXDATELEN + 1];
@@ -353,13 +355,13 @@ rrtimeslice_out(PG_FUNCTION_ARGS)
 	tslice = PG_GETARG_RRTIMESLICE_P(0);
 
 	if (TIMESTAMP_NOT_FINITE(tslice->tstamp)
-			|| (timestamp2tm(tslice->tstamp, NULL, &tm, &fsec, NULL, NULL) != 0))
+			|| (timestamp2tm(tslice->tstamp, &tz, &tm, &fsec, &tz_str, NULL) != 0))
 		ereport(ERROR, (
 					errcode(ERRCODE_DATETIME_VALUE_OUT_OF_RANGE),
 					errmsg("invalid (non-finite) timestamp")
 				));
 	else
-		EncodeDateTime(&tm, fsec, NULL, &tz, DateStyle, buf_ts);
+		EncodeDateTime(&tm, fsec, &tz, &tz_str, DateStyle, buf_ts);
 
 	if (! rrtimeslice_get_spec(tslice->tsid, &len, &num)) {
 		memset(&interval, 0, sizeof(interval));
@@ -474,21 +476,21 @@ rrtimeslice_to_rrtimeslice(PG_FUNCTION_ARGS)
 } /* rrtimeslice_to_rrtimeslice */
 
 Datum
-rrtimeslice_to_timestamp(PG_FUNCTION_ARGS)
+rrtimeslice_to_timestamptz(PG_FUNCTION_ARGS)
 {
 	rrtimeslice_t *tslice;
 
 	if (PG_NARGS() != 1)
 		ereport(ERROR, (
-					errmsg("rrtimeslice_to_timestamp() "
+					errmsg("rrtimeslice_to_timestamptz() "
 						"expects one argument"),
-					errhint("Usage: rrtimeslice_to_timestamp"
+					errhint("Usage: rrtimeslice_to_timestamptz"
 						"(rrtimeslice)")
 				));
 
 	tslice = PG_GETARG_RRTIMESLICE_P(0);
-	PG_RETURN_TIMESTAMP(tslice->tstamp);
-} /* rrtimeslice_to_timestamp */
+	PG_RETURN_TIMESTAMPTZ(tslice->tstamp);
+} /* rrtimeslice_to_timestamptz */
 
 int
 rrtimeslice_seq_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2)
