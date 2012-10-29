@@ -65,7 +65,7 @@ postrr_version(PG_FUNCTION_ARGS)
 	snprintf(version, sizeof(version),
 			"PostgreSQL Round-Robin Extension, version %s\n"
 			"Built against PostgreSQL version "PG_VERSION,
-			POSTRR_VERSION_STRING);
+			POSTRR_VERSION_STRING POSTRR_VERSION_EXTRA);
 	version[sizeof(version) - 1] = '\0';
 
 	result = pstrdup(version);
