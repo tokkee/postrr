@@ -26,13 +26,15 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-PG_CONFIG=`which pg_config`
+if test -z "$PG_CONFIG"; then
+	PG_CONFIG=`which pg_config`
+fi
 if test -z "$PG_CONFIG"; then
 	echo "pg_config not found!" >&2
 	exit 1
 fi
 
-BIN_DIR=`pg_config --bindir`
+BIN_DIR=`$PG_CONFIG --bindir`
 if test -z "$TARGET"; then
 	TARGET=`pwd`/target
 fi
