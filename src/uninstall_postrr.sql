@@ -52,6 +52,8 @@ DROP FUNCTION IF EXISTS PostRR_Version();
 DROP TABLE postrr.rrtimeslices;
 DROP SEQUENCE postrr.tsid;
 
+DROP TABLE postrr.rrarchives;
+
 DROP SCHEMA postrr;
 
 SET client_min_messages TO DEFAULT;
