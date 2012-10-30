@@ -166,7 +166,7 @@ cdata_in(PG_FUNCTION_ARGS)
 		ereport(ERROR, (
 					errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
 					errmsg("invalid input syntax for cdata: \"%s\"", orig),
-					errhint("garbage found after number: \"%s\"", endptr)
+					errdetail("garbage found after number: \"%s\"", endptr)
 				));
 
 	if (typmod > 0)
