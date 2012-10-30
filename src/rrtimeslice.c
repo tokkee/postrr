@@ -44,7 +44,7 @@
 #include <utils/array.h>
 #include <utils/datetime.h>
 #include <utils/timestamp.h>
-#include <miscadmin.h> /* DateStyle, IntervalStyle */
+#include <miscadmin.h> /* DateStyle */
 
 #ifdef HAVE_INT64_TIMESTAMP
 #	define TSTAMP_TO_INT64(t) (t)
@@ -337,8 +337,8 @@ rrtimeslice_out(PG_FUNCTION_ARGS)
 	char *tz_str = NULL;
 
 	char  ts_str[MAXDATELEN + 1];
-	char  buf_ts[MAXDATELEN + 1];
 	char  buf_l[MAXDATELEN + 1];
+	char  buf_u[MAXDATELEN + 1];
 	char *result;
 
 	int32 len = 0;
@@ -353,35 +353,32 @@ rrtimeslice_out(PG_FUNCTION_ARGS)
 	tslice = PG_GETARG_RRTIMESLICE_P(0);
 
 	if (TIMESTAMP_NOT_FINITE(tslice->tstamp)
-			|| (timestamp2tm(tslice->tstamp, &tz, &tm, &fsec, &tz_str, NULL) != 0))
+			|| timestamp2tm(tslice->tstamp, &tz, &tm, &fsec, &tz_str, NULL))
 		ereport(ERROR, (
 					errcode(ERRCODE_DATETIME_VALUE_OUT_OF_RANGE),
 					errmsg("invalid (non-finite) timestamp")
 				));
-	else
-		EncodeDateTime(&tm, fsec, &tz, &tz_str, DateStyle, buf_ts);
+
+	EncodeDateTime(&tm, fsec, &tz, &tz_str, DateStyle, buf_u);
 
 	if (! rrtimeslice_get_spec(tslice->tsid, &len, &num)) {
-		Interval interval;
+		TimestampTz lower = tslice->tstamp - (len * USECS_PER_SEC);
 
-		memset(&interval, 0, sizeof(interval));
-		interval.time = len * USECS_PER_SEC;
-		fsec = 0;
-
-		if (interval2tm(interval, &tm, &fsec))
+		if (timestamp2tm(lower, &tz, &tm, &fsec, &tz_str, NULL))
 			ereport(ERROR, (
-						errmsg("could not convert interval to tm")
+						errcode(ERRCODE_DATETIME_VALUE_OUT_OF_RANGE),
+						errmsg("invalid (non-finite) lower timestamp")
 					));
 
-		EncodeInterval(&tm, fsec, IntervalStyle, buf_l);
+		EncodeDateTime(&tm, fsec, &tz, &tz_str, DateStyle, buf_l);
 	}
 	else {
 		strncpy(buf_l, "ERR", sizeof(buf_l));
 		buf_l[sizeof(buf_l) - 1] = '\0';
 	}
 
-	snprintf(ts_str, sizeof(ts_str), "%s -%s (#%i)",
-			buf_ts, buf_l, tslice->seq);
+	snprintf(ts_str, sizeof(ts_str), "(%s, %s] #%i/%i",
+			buf_l, buf_u, tslice->seq, num);
 
 	result = pstrdup(ts_str);
 	PG_RETURN_CSTRING(result);
