@@ -330,8 +330,6 @@ rrtimeslice_out(PG_FUNCTION_ARGS)
 {
 	rrtimeslice_t *tslice;
 
-	Interval interval;
-
 	struct pg_tm tm;
 	fsec_t fsec = 0;
 	int tz = 0;
@@ -364,6 +362,8 @@ rrtimeslice_out(PG_FUNCTION_ARGS)
 		EncodeDateTime(&tm, fsec, &tz, &tz_str, DateStyle, buf_ts);
 
 	if (! rrtimeslice_get_spec(tslice->tsid, &len, &num)) {
+		Interval interval;
+
 		memset(&interval, 0, sizeof(interval));
 		interval.time = len * USECS_PER_SEC;
 		fsec = 0;
@@ -372,13 +372,13 @@ rrtimeslice_out(PG_FUNCTION_ARGS)
 			ereport(ERROR, (
 						errmsg("could not convert interval to tm")
 					));
+
+		EncodeInterval(&tm, fsec, IntervalStyle, buf_l);
 	}
 	else {
 		strncpy(buf_l, "ERR", sizeof(buf_l));
 		buf_l[sizeof(buf_l) - 1] = '\0';
 	}
-
-	EncodeInterval(&tm, fsec, IntervalStyle, buf_l);
 
 	snprintf(ts_str, sizeof(ts_str), "%s -%s (#%i)",
 			buf_ts, buf_l, tslice->seq);
