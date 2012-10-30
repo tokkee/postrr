@@ -377,7 +377,7 @@ rrtimeslice_out(PG_FUNCTION_ARGS)
 		buf_l[sizeof(buf_l) - 1] = '\0';
 	}
 
-	snprintf(ts_str, sizeof(ts_str), "(%s, %s] #%i/%i",
+	snprintf(ts_str, sizeof(ts_str), "(\"%s\", \"%s\"] #%i/%i",
 			buf_l, buf_u, tslice->seq, num);
 
 	result = pstrdup(ts_str);
