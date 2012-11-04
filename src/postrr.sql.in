@@ -353,9 +353,9 @@ CREATE OR REPLACE FUNCTION PostRR_update(text, timestamptz, double precision)
 	LANGUAGE plpgsql
 	AS $$
 DECLARE
-	rraname ALIAS FOR $1;
-	ts ALIAS FOR $2;
-	value ALIAS FOR $3;
+	-- $1: rraname
+	-- $2: timestamp
+	-- $3: value
 	adef RECORD;
 	new cdata;
 BEGIN
