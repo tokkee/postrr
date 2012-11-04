@@ -361,12 +361,7 @@ DECLARE
 BEGIN
 	FOR adef IN SELECT tbl, tscol, vcol FROM postrr.rrarchives
 			WHERE postrr.rrarchives.rraname = $1 LOOP
-		EXECUTE 'SELECT PostRR_update('
-			|| quote_literal(adef.tbl) || ', '
-			|| quote_literal(adef.tscol) || ', '
-			|| quote_literal(adef.vcol) || ', '
-			|| quote_literal(ts) || ', '
-			|| quote_literal(value) || ')'
+		SELECT PostRR_update(adef.tbl, adef.tscol, adef.vcol, $2, $3)
 			INTO new;
 		RETURN NEXT new;
 	END LOOP;
