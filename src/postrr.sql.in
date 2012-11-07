@@ -320,6 +320,7 @@ DECLARE
 	ts_str text;
 	v_str text;
 	update_qry text;
+	status integer;
 	newts rrtimeslice;
 	new cdata;
 BEGIN
@@ -330,13 +331,13 @@ BEGIN
 
 	update_qry = 'CData_update(' || vcol || ', ' || v_str || ')';
 
+	-- XXX: handle race conditions
+
 	BEGIN
-		EXECUTE 'UPDATE ' || tbl
-			|| ' SET ' || tscol || ' = ' || ts_str
-			|| ', ' || vcol || ' = ' || update_qry
+		EXECUTE 'SELECT rrtimeslice_cmp(' || tscol || ', ' || ts_str
+			|| ') AS status FROM ' || tbl
 			|| ' WHERE ' || tscol || ' = ' || ts_str
-			|| ' RETURNING ' || tscol || ', ' || vcol
-			INTO STRICT newts, new;
+			INTO STRICT status;
 
 		EXCEPTION
 			WHEN NO_DATA_FOUND THEN
@@ -346,9 +347,29 @@ BEGIN
 					|| ') RETURNING ' || tscol || ', ' || vcol
 					INTO newts, new;
 				-- use strict again; on exception retry?
+				RETURN new;
 			WHEN TOO_MANY_ROWS THEN
 				RAISE EXCEPTION '% is not unique in %.%', ts_str, tbl, tscol;
 	END;
+
+	IF status = 0 THEN
+		-- timestamps match
+		EXECUTE 'UPDATE ' || tbl
+			|| ' SET ' || vcol || ' = ' || update_qry
+			|| ' WHERE ' || tscol || ' = ' || ts_str
+			|| ' RETURNING ' || tscol || ', ' || vcol
+			INTO STRICT newts, new;
+	ELSIF status < 0 THEN
+		-- given timestamp is newer than in the database
+		EXECUTE 'UPDATE ' || tbl
+			|| ' SET ' || tscol || ' = ' || ts_str
+			|| ', ' || vcol || ' = ' || v_str
+			|| ' WHERE ' || tscol || ' = ' || ts_str
+			|| ' RETURNING ' || tscol || ', ' || vcol
+			INTO STRICT newts, new;
+	ELSE
+		RAISE EXCEPTION '% is too old in %.%', ts_str, tbl, tscol;
+	END IF;
 	RETURN new;
 END;
 $$;
