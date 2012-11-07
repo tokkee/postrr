@@ -83,6 +83,10 @@ rrtimeslice_to_timestamptz(PG_FUNCTION_ARGS);
 
 /* comparison operators */
 Datum
+rrtimeslice_cmp(PG_FUNCTION_ARGS);
+
+/* sequence comparison operators */
+Datum
 rrtimeslice_seq_eq(PG_FUNCTION_ARGS);
 Datum
 rrtimeslice_seq_ne(PG_FUNCTION_ARGS);
@@ -103,6 +107,27 @@ rrtimeslice_seq_hash(PG_FUNCTION_ARGS);
  * internal (not fmgr-callable) functions
  */
 
+/*
+ * compare two RRTimeslices
+ *
+ * returns:
+ *  - -2 if ts1 < ts2 (sequence numbers don't match)
+ *  - -1 if ts1 < ts2 (sequence numbers match)
+ *  -  0 if ts1 = ts2
+ *  -  1 if ts1 > ts2 (sequence numbers match)
+ *  -  2 if ts1 > ts2 (sequence numbers don't match)
+ */
+int
+rrtimeslice_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2);
+
+/*
+ * compare sequence numbers of two RRTimeslices
+ *
+ * returns:
+ *  - -1 if ts1 < ts2
+ *  -  0 if ts1 = ts2
+ *  -  1 if ts1 > ts2
+ */
 int
 rrtimeslice_seq_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2);
 

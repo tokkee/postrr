@@ -117,6 +117,11 @@ CREATE CAST (rrtimeslice AS timestamptz)
 	WITH FUNCTION Tstamptz(rrtimeslice);
 	-- EXPLICIT
 
+CREATE OR REPLACE FUNCTION rrtimeslice_cmp(rrtimeslice, rrtimeslice)
+	RETURNS integer
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_cmp'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
 CREATE OR REPLACE FUNCTION rrtimeslice_seq_eq(rrtimeslice, rrtimeslice)
 	RETURNS boolean
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_eq'

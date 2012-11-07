@@ -196,6 +196,43 @@ rrtimeslice_apply_typmod(rrtimeslice_t *tslice, int32 typmod)
 } /* rrtimeslice_apply_typmod */
 
 /*
+ * rrtimeslice_cmp_unify:
+ * Unify two RRTimeslices in order to prepare them for comparison. That is, if
+ * either one of the arguments does not have any typmod applied, then apply
+ * the typmod of the other argument. Throws an error if the typmods don't
+ * match.
+ *
+ * Returns:
+ *  - 0 if the arguments could be unified
+ *  - 1 if only the first argument is NULL
+ *  - 2 if both arguments are NULL
+ *  - 3 if only the second argument is NULL
+ */
+static int
+rrtimeslice_cmp_unify(rrtimeslice_t *ts1, rrtimeslice_t *ts2)
+{
+	if ((! ts1) && (! ts2))
+		return 0;
+	else if (! ts1)
+		return -1;
+	else if (! ts2)
+		return 1;
+
+	if (ts1->tsid && (! ts2->tsid))
+		rrtimeslice_apply_typmod(ts2, ts1->tsid);
+	else if ((! ts1->tsid) && ts2->tsid)
+		rrtimeslice_apply_typmod(ts1, ts2->tsid);
+
+	if (ts1->tsid != ts2->tsid) /* XXX: compare len/num */
+		ereport(ERROR, (
+					errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+					errmsg("invalid comparison: cannot compare "
+						"rrtimeslices with different typmods (yet)")
+				));
+	return 0;
+} /* rrtimeslice_cmp_unify */
+
+/*
  * prototypes for PostgreSQL functions
  */
 
@@ -208,6 +245,8 @@ PG_FUNCTION_INFO_V1(rrtimeslice_typmodout);
 
 PG_FUNCTION_INFO_V1(rrtimeslice_to_rrtimeslice);
 PG_FUNCTION_INFO_V1(rrtimeslice_to_timestamptz);
+
+PG_FUNCTION_INFO_V1(rrtimeslice_cmp);
 
 PG_FUNCTION_INFO_V1(rrtimeslice_seq_eq);
 PG_FUNCTION_INFO_V1(rrtimeslice_seq_ne);
@@ -490,26 +529,43 @@ rrtimeslice_to_timestamptz(PG_FUNCTION_ARGS)
 } /* rrtimeslice_to_timestamptz */
 
 int
+rrtimeslice_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2)
+{
+	int status;
+
+	status = rrtimeslice_cmp_unify(ts1, ts2);
+	if (status) /* [1, 3] -> [-1, 1] */
+		return status - 2;
+
+	if (ts1->tstamp == ts2->tstamp)
+		return 0;
+	else if ((ts1->seq == ts2->seq) && (ts1->tstamp < ts2->tstamp))
+		return -1;
+	else if (ts1->tstamp < ts2->tstamp)
+		return -2;
+	else if ((ts1->seq == ts2->seq) && (ts1->tstamp > ts2->tstamp))
+		return 1;
+	else
+		return 2;
+} /* rrtimeslice_cmp_internal */
+
+Datum
+rrtimeslice_cmp(PG_FUNCTION_ARGS)
+{
+	rrtimeslice_t *ts1 = PG_GETARG_RRTIMESLICE_P(0);
+	rrtimeslice_t *ts2 = PG_GETARG_RRTIMESLICE_P(1);
+
+	PG_RETURN_INT32(rrtimeslice_cmp_internal(ts1, ts2));
+} /* rrtimeslice_cmp */
+
+int
 rrtimeslice_seq_cmp_internal(rrtimeslice_t *ts1, rrtimeslice_t *ts2)
 {
-	if ((! ts1) && (! ts2))
-		return 0;
-	else if (! ts1)
-		return -1;
-	else if (! ts2)
-		return 1;
+	int status;
 
-	if (ts1->tsid && (! ts2->tsid))
-		rrtimeslice_apply_typmod(ts2, ts1->tsid);
-	else if ((! ts1->tsid) && ts2->tsid)
-		rrtimeslice_apply_typmod(ts1, ts2->tsid);
-
-	if (ts1->tsid != ts2->tsid) /* XXX: compare len/num */
-		ereport(ERROR, (
-					errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-					errmsg("invalid comparison: cannot compare "
-						"rrtimeslices with different typmods (yet)")
-				));
+	status = rrtimeslice_cmp_unify(ts1, ts2);
+	if (status) /* [1, 3] -> [-1, 1] */
+		return status - 2;
 
 	if (ts1->seq < ts2->seq)
 		return -1;
@@ -580,7 +636,7 @@ rrtimeslice_seq_cmp(PG_FUNCTION_ARGS)
 	rrtimeslice_t *ts2 = PG_GETARG_RRTIMESLICE_P(1);
 
 	PG_RETURN_INT32(rrtimeslice_seq_cmp_internal(ts1, ts2));
-} /* rrtimeslice_seq_ge */
+} /* rrtimeslice_seq_cmp */
 
 Datum
 rrtimeslice_seq_hash(PG_FUNCTION_ARGS)
