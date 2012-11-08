@@ -79,6 +79,8 @@ rrtimeslice_typmodout(PG_FUNCTION_ARGS);
 Datum
 rrtimeslice_to_rrtimeslice(PG_FUNCTION_ARGS);
 Datum
+timestamptz_to_rrtimeslice(PG_FUNCTION_ARGS);
+Datum
 rrtimeslice_to_timestamptz(PG_FUNCTION_ARGS);
 
 /* comparison operators */

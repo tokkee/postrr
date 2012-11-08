@@ -108,6 +108,15 @@ CREATE CAST (rrtimeslice AS rrtimeslice)
 	WITH FUNCTION RRTimeslice(rrtimeslice, integer, boolean)
 	AS IMPLICIT;
 
+CREATE OR REPLACE FUNCTION RRTimeslice(timestamptz, integer, boolean)
+	RETURNS rrtimeslice
+	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'timestamptz_to_rrtimeslice'
+	LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE CAST (timestamptz AS rrtimeslice)
+	WITH FUNCTION RRTimeslice(timestamptz, integer, boolean)
+	AS IMPLICIT;
+
 CREATE OR REPLACE FUNCTION Tstamptz(rrtimeslice)
 	RETURNS timestamptz
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_to_timestamptz'

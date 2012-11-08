@@ -244,6 +244,7 @@ PG_FUNCTION_INFO_V1(rrtimeslice_typmodin);
 PG_FUNCTION_INFO_V1(rrtimeslice_typmodout);
 
 PG_FUNCTION_INFO_V1(rrtimeslice_to_rrtimeslice);
+PG_FUNCTION_INFO_V1(timestamptz_to_rrtimeslice);
 PG_FUNCTION_INFO_V1(rrtimeslice_to_timestamptz);
 
 PG_FUNCTION_INFO_V1(rrtimeslice_cmp);
@@ -510,6 +511,34 @@ rrtimeslice_to_rrtimeslice(PG_FUNCTION_ARGS)
 
 	PG_RETURN_RRTIMESLICE_P(tslice);
 } /* rrtimeslice_to_rrtimeslice */
+
+Datum
+timestamptz_to_rrtimeslice(PG_FUNCTION_ARGS)
+{
+	TimestampTz tstamp;
+	int32 typmod;
+
+	rrtimeslice_t *tslice;
+
+	if (PG_NARGS() != 3)
+		ereport(ERROR, (
+					errmsg("timestamptz_to_rrtimeslice() "
+						"expects three arguments"),
+					errhint("Usage: timestamptz_to_rrtimeslice"
+						"(timestamptz, typmod, is_explicit)")
+				));
+
+	tstamp = PG_GETARG_TIMESTAMPTZ(0);
+	typmod = PG_GETARG_INT32(1);
+
+	tslice = (rrtimeslice_t *)palloc0(sizeof(*tslice));
+
+	tslice->tstamp = tstamp;
+	if (typmod >= 0)
+		rrtimeslice_apply_typmod(tslice, typmod);
+
+	PG_RETURN_RRTIMESLICE_P(tslice);
+} /* timestamptz_to_rrtimeslice */
 
 Datum
 rrtimeslice_to_timestamptz(PG_FUNCTION_ARGS)
