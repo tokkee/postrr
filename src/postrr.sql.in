@@ -342,43 +342,47 @@ BEGIN
 
 	-- XXX: handle race conditions
 
-	BEGIN
-		EXECUTE 'SELECT rrtimeslice_cmp(' || tscol || ', ' || ts_str
-			|| ') AS status FROM ' || tbl
-			|| ' WHERE ' || tscol || ' = ' || ts_str
-			INTO STRICT status;
+	LOOP
+		BEGIN
+			-- removing matching (by sequence no) old entries
+			EXECUTE 'DELETE FROM ' || tbl
+				|| ' WHERE rrtimeslice_cmp(' || tscol || ', ' || ts_str
+				|| ') = -1; '
+				|| 'SELECT rrtimeslice_cmp(' || tscol || ', ' || ts_str
+				|| ') AS status FROM ' || tbl
+				|| ' WHERE ' || tscol || ' = ' || ts_str
+				INTO STRICT status;
 
-		EXCEPTION
-			WHEN NO_DATA_FOUND THEN
-				EXECUTE 'INSERT INTO ' || tbl
-					|| ' (' || tscol || ', ' || vcol
-					|| ') VALUES (' || ts_str || ', ' || v_str
-					|| ') RETURNING ' || tscol || ', ' || vcol
-					INTO newts, new;
-				-- use strict again; on exception retry?
-				RETURN new;
-			WHEN TOO_MANY_ROWS THEN
-				RAISE EXCEPTION '% is not unique in %.%', ts_str, tbl, tscol;
-	END;
+			EXCEPTION
+				WHEN NO_DATA_FOUND THEN
+					EXECUTE 'INSERT INTO ' || tbl
+						|| ' (' || tscol || ', ' || vcol
+						|| ') VALUES (' || ts_str || ', ' || v_str
+						|| ') RETURNING ' || tscol || ', ' || vcol
+						INTO newts, new;
+					-- use strict again; on exception retry?
+					RETURN new;
+				WHEN TOO_MANY_ROWS THEN
+					RAISE EXCEPTION '% is not unique in %.%',
+						ts_str, tbl, tscol;
+		END;
 
-	IF status = 0 THEN
-		-- timestamps match
-		EXECUTE 'UPDATE ' || tbl
-			|| ' SET ' || vcol || ' = ' || update_qry
-			|| ' WHERE ' || tscol || ' = ' || ts_str
-			|| ' RETURNING ' || tscol || ', ' || vcol
-			INTO STRICT newts, new;
-	ELSIF status < 0 THEN
-		-- given timestamp is newer than in the database
-		EXECUTE 'UPDATE ' || tbl
-			|| ' SET ' || tscol || ' = ' || ts_str
-			|| ', ' || vcol || ' = ' || v_str
-			|| ' WHERE ' || tscol || ' = ' || ts_str
-			|| ' RETURNING ' || tscol || ', ' || vcol
-			INTO STRICT newts, new;
-	ELSE
-		RAISE EXCEPTION '% is too old in %.%', ts_str, tbl, tscol;
-	END IF;
+		IF status = 0 THEN
+			-- timestamps match
+			EXECUTE 'UPDATE ' || tbl
+				|| ' SET ' || vcol || ' = ' || update_qry
+				|| ' WHERE ' || tscol || ' = ' || ts_str
+				|| ' RETURNING ' || tscol || ', ' || vcol
+				INTO STRICT newts, new;
+		ELSIF status < 0 THEN
+			-- someone else inserted older data in the meantime
+			-- => try again
+			CONTINUE;
+		ELSE
+			RAISE EXCEPTION '% is too old in %.%', ts_str, tbl, tscol;
+		END IF;
+		EXIT;
+	END LOOP;
 	RETURN new;
 END;
 $$;
