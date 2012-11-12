@@ -96,6 +96,14 @@ case "$1" in
 	restart)
 		$0 stop && $0 start -B
 		;;
+	dump)
+		shift
+		$BIN_DIR/pg_dump -h $TARGET/var/run/postgresql/ -p 2345 "$@"
+		;;
+	restore)
+		shift
+		$BIN_DIR/pg_restore -h $TARGET/var/run/postgresql/ -p 2345 "$@"
+		;;
 	*)
 		echo "Usage: $0 setup|client|stop|start" >&2
 		echo ""
