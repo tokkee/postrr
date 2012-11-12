@@ -3,7 +3,7 @@ AM_CFLAGS = @STRICT_CFLAGS@
 BUILT_SOURCES = postrr.h
 CLEANFILES = postrr.h
 
-all-local: postrr.h postrr.sql Makefile.pgxs ../version-gen.sh
+all-local: postrr.h postrr.sql postrr.control Makefile.pgxs ../version-gen.sh
 	@echo Building $(PACKAGE_NAME) version $$( cd ..; ./version-gen.sh )
 	make -f Makefile.pgxs all
 
