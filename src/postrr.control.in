@@ -1,6 +1,6 @@
 # PostRR extension
 comment = 'PostgreSQL Round Robin Extension'
-default_version = '@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@.@POSTRR_PATCH_VERSION@'
+default_version = '@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@'
 module_pathname = '$libdir/postrr'
 relocatable = false
 superuser = false
