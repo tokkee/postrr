@@ -33,6 +33,7 @@
 
 #include <errno.h>
 #include <string.h>
+#include <math.h>
 
 #include <postgres.h>
 #include <fmgr.h>
@@ -152,6 +153,10 @@ cdata_in(PG_FUNCTION_ARGS)
 	errno = 0;
 	data->value   = strtod(val_str, &endptr);
 	data->val_num = 1;
+
+	if (isnan(data->value)) {
+		data->undef_num = 1;
+	}
 
 	if ((endptr == val_str) || errno)
 		ereport(ERROR, (
@@ -358,6 +363,12 @@ cdata_update(PG_FUNCTION_ARGS)
 	cdata_t *data;
 	cdata_t *update;
 
+	float8 value;
+	float8 u_value;
+
+	int32 val_num;
+	int32 u_val_num;
+
 	if (PG_NARGS() != 2)
 		ereport(ERROR, (
 					errmsg("cdata_update() expects two arguments"),
@@ -380,20 +391,30 @@ cdata_update(PG_FUNCTION_ARGS)
 						"consolidation function")
 				));
 
+	value     = data->value;
+	u_value   = update->value;
+
+	val_num   = data->val_num - data->undef_num;
+	u_val_num = update->val_num - update->undef_num;
+
+	data->undef_num += update->undef_num;
+	data->val_num   += update->val_num;
+
+	if (isnan(value) || isnan(u_value)) {
+		data->value = isnan(value) ? u_value : value;
+		PG_RETURN_CDATA_P(data);
+	}
+
 	switch (data->cf) {
 		case CF_AVG:
-			data->value = (data->value * (data->val_num - data->undef_num))
-				+ (update->value * (update->val_num - update->undef_num));
-			data->value /= (data->val_num - data->undef_num)
-					+  (update->val_num - update->undef_num);
+			data->value = ((value * val_num) + (u_value * u_val_num))
+				/ (val_num + u_val_num);
 			break;
 		case CF_MIN:
-			data->value = (data->value <= update->value)
-				? data->value : update->value;
+			data->value = (value < u_value) ? value : u_value;
 			break;
 		case CF_MAX:
-			data->value = (data->value >= update->value)
-				? data->value : update->value;
+			data->value = (value >= u_value) ? value : u_value;
 			break;
 		default:
 			ereport(ERROR, (
@@ -403,9 +424,6 @@ cdata_update(PG_FUNCTION_ARGS)
 					));
 			break;
 	}
-
-	data->undef_num += update->undef_num;
-	data->val_num   += update->val_num;
 	PG_RETURN_CDATA_P(data);
 } /* cdata_update */
 
