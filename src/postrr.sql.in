@@ -27,10 +27,8 @@
 -- PostRR - PostgreSQL Round-Robin Extension
 --
 
--- suppress messages like 'return type foo is only a shell'
-SET client_min_messages TO WARNING;
-
-BEGIN;
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION postrr" to load this file. \quit
 
 CREATE SCHEMA postrr;
 
@@ -45,6 +43,8 @@ CREATE TABLE postrr.rrtimeslices (
 	tsnum integer NOT NULL
 );
 
+SELECT pg_catalog.pg_extension_config_dump('postrr.rrtimeslices', '');
+
 CREATE TABLE postrr.rrarchives (
 	rraname text NOT NULL,
 	tbl name NOT NULL,
@@ -52,6 +52,8 @@ CREATE TABLE postrr.rrarchives (
 	vcol name NOT NULL,
 	UNIQUE (rraname, tbl, tscol, vcol)
 );
+
+SELECT pg_catalog.pg_extension_config_dump('postrr.rrarchives', '');
 
 CREATE OR REPLACE FUNCTION PostRR_Version()
 	RETURNS cstring
@@ -407,10 +409,6 @@ BEGIN
 	RETURN;
 END;
 $$;
-
-COMMIT;
-
-SET client_min_messages TO DEFAULT;
 
 -- vim: set tw=78 sw=4 ts=4 noexpandtab :
 

@@ -247,7 +247,7 @@ AM_CONDITIONAL([BUILD_DOCUMENTATION], test "x$build_documentation" = "xyes")
 
 AC_CONFIG_FILES([Makefile doc/Makefile
 		src/Makefile src/Makefile.pgxs
-		src/postrr.sql])
+		src/postrr.sql src/postrr.control])
 AC_OUTPUT
 
 AC_MSG_RESULT()

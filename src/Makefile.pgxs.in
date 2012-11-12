@@ -25,15 +25,16 @@
 PG_CPPFLAGS = @STRICT_CPPFLAGS@ -I@abs_builddir@
 
 MODULE_big=postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@
-MODULEDIR=contrib/$(MODULE)
 
 PG_OBJS=base.o \
 		cdata.o \
 		rrtimeslice.o \
 		utils/pg_spi.o
 
+EXTENSION=postrr
+
 DATA=postrr_comments.sql uninstall_postrr.sql
-DATA_built=postrr.sql
+DATA_built=postrr--@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@.@POSTRR_PATCH_VERSION@.sql
 
 # objects to be build by PGXS
 OBJS=$(PG_OBJS)
@@ -42,4 +43,7 @@ OBJS=$(PG_OBJS)
 PG_CONFIG=@PG_CONFIG@
 PGXS=@PGXS@
 include $(PGXS)
+
+postrr--@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@.@POSTRR_PATCH_VERSION@.sql: postrr.sql
+	cp $< $@
 

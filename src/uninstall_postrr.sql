@@ -27,36 +27,7 @@
 -- PostRR - PostgreSQL Round-Robin Extension
 --
 
-SET client_min_messages TO WARNING;
-
-DROP FUNCTION IF EXISTS RRTimeslice_validate(integer);
-
-DROP CAST IF EXISTS (rrtimeslice AS rrtimeslice);
-DROP FUNCTION IF EXISTS RRTimeslice(rrtimeslice, integer, boolean);
-DROP CAST IF EXISTS (rrtimeslice AS timestamp);
-DROP FUNCTION IF EXISTS Tstamp(rrtimeslice);
-DROP TYPE RRTimeslice CASCADE;
-DROP FUNCTION IF EXISTS RRTimeslice_typmodin(cstring[]);
-DROP FUNCTION IF EXISTS RRTimeslice_typmodout(integer);
-
-DROP FUNCTION IF EXISTS CData_validate(integer);
-
-DROP CAST IF EXISTS (cdata AS cdata);
-DROP FUNCTION IF EXISTS CData(cdata, integer, boolean);
-DROP TYPE CData CASCADE;
-DROP FUNCTION IF EXISTS CData_typmodin(cstring[]);
-DROP FUNCTION IF EXISTS CData_typmodout(integer);
-
-DROP FUNCTION IF EXISTS PostRR_Version();
-
-DROP TABLE postrr.rrtimeslices;
-DROP SEQUENCE postrr.tsid;
-
-DROP TABLE postrr.rrarchives;
-
-DROP SCHEMA postrr;
-
-SET client_min_messages TO DEFAULT;
+DROP EXTENSION postrr;
 
 -- vim: set tw=78 sw=4 ts=4 noexpandtab :
 

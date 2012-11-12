@@ -25,7 +25,9 @@ ltmain.sh
 *.lo
 *.o
 postrr.7
+postrr.control
 postrr.h
 postrr.sql
+postrr--*.sql
 postrr-*.so
 
