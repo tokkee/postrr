@@ -58,14 +58,14 @@ SELECT pg_catalog.pg_extension_config_dump('postrr.rrarchives', '');
 CREATE OR REPLACE FUNCTION PostRR_Version()
 	RETURNS cstring
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'postrr_version'
-	LANGUAGE 'C' IMMUTABLE;
+	LANGUAGE C IMMUTABLE;
 
 CREATE TYPE RRTimeslice;
 
 CREATE OR REPLACE FUNCTION RRTimeslice_validate(integer)
 	RETURNS cstring
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_validate'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 -- this will abort the transaction in case the expected internal length does
 -- not match the actual length
@@ -74,22 +74,22 @@ SELECT RRTimeslice_validate(16);
 CREATE OR REPLACE FUNCTION RRTimeslice_in(cstring, oid, integer)
 	RETURNS RRTimeslice
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_in'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION RRTimeslice_out(RRTimeslice)
 	RETURNS cstring
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_out'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION RRTimeslice_typmodin(cstring[])
 	RETURNS integer
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_typmodin'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION RRTimeslice_typmodout(integer)
 	RETURNS cstring
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_typmodout'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE TYPE RRTimeslice (
 	INTERNALLENGTH = 16,
@@ -104,7 +104,7 @@ CREATE TYPE RRTimeslice (
 CREATE OR REPLACE FUNCTION RRTimeslice(rrtimeslice, integer, boolean)
 	RETURNS rrtimeslice
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_to_rrtimeslice'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE CAST (rrtimeslice AS rrtimeslice)
 	WITH FUNCTION RRTimeslice(rrtimeslice, integer, boolean)
@@ -113,7 +113,7 @@ CREATE CAST (rrtimeslice AS rrtimeslice)
 CREATE OR REPLACE FUNCTION RRTimeslice(timestamptz, integer, boolean)
 	RETURNS rrtimeslice
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'timestamptz_to_rrtimeslice'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE CAST (timestamptz AS rrtimeslice)
 	WITH FUNCTION RRTimeslice(timestamptz, integer, boolean)
@@ -122,7 +122,7 @@ CREATE CAST (timestamptz AS rrtimeslice)
 CREATE OR REPLACE FUNCTION Tstamptz(rrtimeslice)
 	RETURNS timestamptz
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_to_timestamptz'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE CAST (rrtimeslice AS timestamptz)
 	WITH FUNCTION Tstamptz(rrtimeslice);
@@ -131,47 +131,47 @@ CREATE CAST (rrtimeslice AS timestamptz)
 CREATE OR REPLACE FUNCTION rrtimeslice_cmp(rrtimeslice, rrtimeslice)
 	RETURNS integer
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_cmp'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION rrtimeslice_seq_eq(rrtimeslice, rrtimeslice)
 	RETURNS boolean
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_eq'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION rrtimeslice_seq_ne(rrtimeslice, rrtimeslice)
 	RETURNS boolean
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_ne'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION rrtimeslice_seq_lt(rrtimeslice, rrtimeslice)
 	RETURNS boolean
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_lt'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION rrtimeslice_seq_le(rrtimeslice, rrtimeslice)
 	RETURNS boolean
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_le'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION rrtimeslice_seq_gt(rrtimeslice, rrtimeslice)
 	RETURNS boolean
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_gt'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION rrtimeslice_seq_ge(rrtimeslice, rrtimeslice)
 	RETURNS boolean
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_ge'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION rrtimeslice_seq_cmp(rrtimeslice, rrtimeslice)
 	RETURNS integer
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_cmp'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION rrtimeslice_seq_hash(rrtimeslice)
 	RETURNS integer
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'rrtimeslice_seq_hash'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OPERATOR = (
 	LEFTARG    = RRTimeslice,
@@ -246,7 +246,7 @@ CREATE TYPE CData;
 CREATE OR REPLACE FUNCTION CData_validate(integer)
 	RETURNS cstring
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_validate'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 -- this will abort the transaction in case the expected internal length does
 -- not match the actual length
@@ -255,22 +255,22 @@ SELECT CData_validate(24);
 CREATE OR REPLACE FUNCTION CData_in(cstring, oid, integer)
 	RETURNS CData
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_in'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION CData_out(CData)
 	RETURNS cstring
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_out'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION CData_typmodin(cstring[])
 	RETURNS integer
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_typmodin'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION CData_typmodout(integer)
 	RETURNS cstring
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_typmodout'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE TYPE CData (
 	INTERNALLENGTH = 24,
@@ -285,7 +285,7 @@ CREATE TYPE CData (
 CREATE OR REPLACE FUNCTION CData(cdata, integer, boolean)
 	RETURNS cdata
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_to_cdata'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE CAST (cdata AS cdata)
 	WITH FUNCTION CData(cdata, integer, boolean)
@@ -298,7 +298,7 @@ CREATE CAST (numeric AS cdata)
 CREATE OR REPLACE FUNCTION CData(integer, integer, boolean)
 	RETURNS cdata
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'int32_to_cdata'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE CAST (integer AS cdata)
 	WITH FUNCTION CData(integer, integer, boolean)
@@ -307,7 +307,7 @@ CREATE CAST (integer AS cdata)
 CREATE OR REPLACE FUNCTION Float8(cdata)
 	RETURNS double precision
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_to_float8'
-	LANGUAGE 'C' IMMUTABLE STRICT;
+	LANGUAGE C IMMUTABLE STRICT;
 
 CREATE CAST (cdata AS double precision)
 	WITH FUNCTION Float8(cdata);
@@ -316,7 +316,7 @@ CREATE CAST (cdata AS double precision)
 CREATE OR REPLACE FUNCTION CData_update(cdata, cdata)
 	RETURNS cdata
 	AS 'postrr-@POSTRR_MAJOR_VERSION@.@POSTRR_MINOR_VERSION@', 'cdata_update'
-	LANGUAGE 'C' IMMUTABLE;
+	LANGUAGE C IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION PostRR_update(name, name, name, timestamptz, double precision)
 	RETURNS cdata
