@@ -374,7 +374,7 @@ rrtimeslice_out(PG_FUNCTION_ARGS)
 	fsec_t fsec = 0;
 	int tz = 0;
 
-	char *tz_str = NULL;
+	const char *tz_str = NULL;
 
 	char  ts_str[MAXDATELEN + 1];
 	char  buf_l[MAXDATELEN + 1];
@@ -399,7 +399,7 @@ rrtimeslice_out(PG_FUNCTION_ARGS)
 					errmsg("invalid (non-finite) timestamp")
 				));
 
-	EncodeDateTime(&tm, fsec, &tz, &tz_str, DateStyle, buf_u);
+	EncodeDateTime(&tm, fsec, 1, tz, tz_str, DateStyle, buf_u);
 
 	if (! rrtimeslice_get_spec(tslice->tsid, &len, &num)) {
 		TimestampTz lower = tslice->tstamp - (len * USECS_PER_SEC);
@@ -410,7 +410,7 @@ rrtimeslice_out(PG_FUNCTION_ARGS)
 						errmsg("invalid (non-finite) lower timestamp")
 					));
 
-		EncodeDateTime(&tm, fsec, &tz, &tz_str, DateStyle, buf_l);
+		EncodeDateTime(&tm, fsec, 1, tz, tz_str, DateStyle, buf_l);
 	}
 	else {
 		strncpy(buf_l, "ERR", sizeof(buf_l));
